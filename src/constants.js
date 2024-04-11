@@ -4,25 +4,25 @@ import learnerInstructionsHtml from "../assets/instructions/learner-instructions
 import testPhaseInstructionsHtml from "../assets/instructions/test-phase-instructions.html";
 import writeMessageHtml from "../assets/instructions/write-message-instructions.html";
 
-export const bucketHTML = `
-<img src="assets/images/%choice%-bucket.svg", class="bucket">
+export const fishHTML = `
+<img src="assets/images/%choice%-fish.svg", class="fish">
 `;
 
 export const formatFeedback = (
-  lastCorrectBucket,
+  lastCorrectFish,
   lastTrialCorrect,
-  allBuckets,
+  allFishes,
 ) => {
   let message;
   if (lastTrialCorrect) {
-    message = `<span class="green bold">Correct!</span> The coin was in the ${lastCorrectBucket} bucket.`;
+    message = `<span class="green bold">Correct!</span> The coin was in the ${lastCorrectFish} fish.`;
   } else {
-    message = `<span class="red bold">Incorrect.</span> The coin was actually in the ${lastCorrectBucket} bucket.`;
+    message = `<span class="red bold">Incorrect.</span> The coin was actually in the ${lastCorrectFish} fish.`;
   }
-  const bucketStimulus = allBuckets
-    .map((bucket) => {
-      const bucketImg = bucketHTML.replace("%choice%", bucket);
-      return `<div class="bucketWrapper">${bucketImg}</div>`;
+  const fishStimulus = allFishes
+    .map((fish) => {
+      const fishImg = fishHTML.replace("%choice%", fish);
+      return `<div class="fishWrapper">${fishImg}</div>`;
     })
     .join("");
 
@@ -31,14 +31,14 @@ export const formatFeedback = (
     ${message}
     </div>
     <div class = "coinRow" style="grid-template-columns:repeat(${
-      allBuckets.length
-    }, 1fr);width:calc(196 * ${allBuckets.length});">
+      allFishes.length
+    }, 1fr);width:calc(196 * ${allFishes.length});">
     <img src="assets/images/coin.svg" class="coin" style="grid-column:${
-      allBuckets.indexOf(lastCorrectBucket) + 1
+      allFishes.indexOf(lastCorrectFish) + 1
     }">
     </div>
-    <div class = "bucketRow">
-    ${bucketStimulus}
+    <div class = "fishRow">
+    ${fishStimulus}
     </div>
     </div>
     `;
@@ -57,21 +57,21 @@ export const messageConditionTimes = {
   2: 30,
 };
 
-export const bucketsByCondition = {
+export const fishesByCondition = {
   0: {
-    buckets: ["red", "blue"],
+    fishes: ["red", "blue"],
     probs: [0.8, 0.2],
   },
   1: {
-    buckets: ["red", "blue"],
+    fishes: ["red", "blue"],
     probs: [0.2, 0.8],
   },
   2: {
-    buckets: ["red", "blue", "green"],
+    fishes: ["red", "blue", "green"],
     probs: [0.1, 0.7, 0.2],
   },
   3: {
-    buckets: ["red", "blue", "green"],
+    fishes: ["red", "blue", "green"],
     probs: [0.2, 0.1, 0.7],
   },
 };

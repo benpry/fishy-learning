@@ -2,17 +2,17 @@ export function range(n) {
   return [...Array(n).keys()];
 }
 
-export function sampleBucket(buckets, probs) {
-  // Sample a bucket from a list of buckets with given probabilities.
+export function sampleFish(fishes, probs) {
+  // Sample a fish from a list of fishes with given probabilities.
   const r = Math.random();
   let sum = 0;
   for (let i = 0; i < probs.length; i++) {
     sum += probs[i];
     if (r < sum) {
-      return buckets[i];
+      return fishes[i];
     }
   }
-  return buckets[buckets.length - 1];
+  return fishes[fishes.length - 1];
 }
 
 function renderLines(message) {

@@ -1,6 +1,6 @@
 import React from "react";
 import { range } from "./utils";
-import { bucketsByCondition } from "./constants";
+import { fishesByCondition } from "./constants";
 import { useState } from "react";
 var { jStat } = require("jstat");
 
@@ -43,7 +43,7 @@ function getDirichletBounds(probs, n, nBuckets) {
 
 export default function Elicitation(props) {
   const condition = props.condition;
-  const bucketNames = bucketsByCondition[condition].buckets;
+  const bucketNames = fishesByCondition[condition].buckets;
   const nBuckets = bucketNames.length;
 
   const [probs, updateProbs] = useState(Array(nBuckets).fill(1 / nBuckets));

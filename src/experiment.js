@@ -1,5 +1,5 @@
 /**
- * @title Where's the coin?
+ * @title Fish Survey
  * @description A learning experiment for humans
  * @version 0.1.0
  *
@@ -16,11 +16,11 @@ import HtmlSurveyText from "./survey-text-timed";
 import { initJsPsych } from "jspsych";
 import {
   getInstructionPages,
-  bucketHTML,
+  fishHTML,
   formatFeedback,
   messageConditionTimes,
   nTrialsByCondition,
-  bucketsByCondition,
+  fishesByCondition,
   consentText,
   testPhaseInstructions,
   getWriteMessageInstructions,
@@ -33,52 +33,19 @@ import {
   updateReads,
 } from "./api";
 import { startTimer } from "./timer";
-import { sampleBucket, renderMessage } from "./utils";
+import { sampleFish, renderMessage } from "./utils";
 import { range } from "./utils";
 import { proliferate } from "./proliferate";
 import ElicitDistributionPlugin from "./elicit-distribution";
 
-/**
- * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
- *
- * @type {import("jspsych-builder").RunFunction}
- */
-export async function run({
+function getInitialTrials(
   assetPaths,
-  input = {},
-  environment,
-  title,
-  version,
-}) {
-  // Chains to assign participants to
-  let chain = null;
-
-  const jsPsych = initJsPsych({
-    on_finish: function (data) {
-      if (!data.last(1).values()[0].failed) {
-        proliferate.submit({
-          trials: data.values(),
-        });
-      }
-    },
-    on_close: () => {
-      if (chain != null) {
-        if (chain.busy) {
-          freeChain(chain._id);
-        }
-      }
-    },
-  });
-
-  const condition = jsPsych.data.getURLVariable("condition");
-  const messageCondition = jsPsych.data.getURLVariable("mC");
-  const messageWritingTime = messageConditionTimes[messageCondition];
-  const doLearning = jsPsych.data.getURLVariable("doL");
-  const receiveMessage = jsPsych.data.getURLVariable("recM");
-  const writeMessage = jsPsych.data.getURLVariable("wM");
-  const nTrials = nTrialsByCondition[condition];
-  const buckets = bucketsByCondition[condition].buckets;
-  const bucketProbs = bucketsByCondition[condition].probs;
+  writeMessage,
+  messageCondition,
+  messageWritingTime,
+  chainHolder,
+  jsPsych,
+) {
   const timeline = [];
 
   // Preload assets
@@ -107,7 +74,7 @@ export async function run({
               { failed: true, failedReason: "noFreeChains" },
             );
           } else {
-            chain = c;
+            chainHolder.item = c;
           }
         });
       } else {
@@ -118,111 +85,131 @@ export async function run({
               { failed: true, failedReason: "noFreeChains" },
             );
           } else {
-            chain = c;
+            chainHolder.item = c;
           }
         });
       }
     },
   });
 
-  if (receiveMessage == 1) {
-    timeline.push({
+  return timeline;
+}
+
+function getReceiveMessageTrial(writeMessage, jsPsych, chainHolder) {
+  return {
+    type: HtmlButtonResponse,
+    stimulus: () => {
+      const chain = chainHolder.item;
+      return chain == null
+        ? "Loading...."
+        : chain.messages.length == 0
+        ? "You are the first participant in your chain, so there is not a message for you to read."
+        : renderMessage(chain.messages[chain.messages.length - 1]);
+    },
+    data: () => {
+      const chain = chainHolder.item;
+      return {
+        phase: "readMessage",
+        chainId: chain._id,
+        messageReceived: chain.messages[chain.messages.length - 1],
+      };
+    },
+    choices: ["Continue"],
+    on_finish: () => {
+      const chain = chainHolder.item;
+      if (writeMessage == 0) {
+        updateReads(chain._id);
+      }
+    },
+  };
+}
+
+function getLearningTrials(condition, jsPsych) {
+  const fishes = fishesByCondition[condition].fishes;
+  const nTrials = nTrialsByCondition[condition];
+  const fishProbs = fishesByCondition[condition].probs;
+
+  const timeline = [];
+
+  timeline.push({
+    type: HtmlButtonResponse,
+    stimulus: `<p>You will now start the learning trials. Press "continue" to begin.</p>`,
+    choices: ["Continue"],
+  });
+
+  const learningStages = [
+    {
       type: HtmlButtonResponse,
-      stimulus: () => {
-        return chain == null
-          ? "Loading...."
-          : chain.messages.length == 0
-          ? "You are the first participant in your chain, so there is not a message for you to read."
-          : renderMessage(chain.messages[chain.messages.length - 1]);
-      },
-      data: () => {
+      stimulus: "Click the fish where you think the coin is",
+      choices: fishes,
+      data: function () {
         return {
-          phase: "readMessage",
-          chainId: chain._id,
-          messageReceived: chain.messages[chain.messages.length - 1],
+          correctFish: jsPsych.timelineVariable("correctFish"),
+          phase: "learning",
         };
       },
-      choices: ["Continue"],
-      on_finish: () => {
-        if (writeMessage == 0) {
-          updateReads(chain._id);
-        }
-      },
-    });
-  }
-
-  if (doLearning == 1) {
-    timeline.push({
+      button_html: fishHTML,
+    },
+    {
       type: HtmlButtonResponse,
-      stimulus: `<p>You will now start the learning trials. Press "continue" to begin.</p>`,
+      stimulus: function () {
+        const lastTrial = jsPsych.data.get().last(1).values()[0];
+        const lastCorrectFish = lastTrial["correctFish"];
+        const lastTrialCorrect =
+          fishes[parseInt(lastTrial["response"])] == lastCorrectFish;
+        return formatFeedback(lastCorrectFish, lastTrialCorrect, fishes);
+      },
       choices: ["Continue"],
-    });
+    },
+  ];
 
-    const learningStages = [
+  const learningTimeline = {
+    timeline: learningStages,
+    timeline_variables: range(nTrials).map((i) => {
+      return {
+        correctFish: sampleFish(fishes, fishProbs),
+      };
+    }),
+    randomize_order: true,
+  };
+
+  timeline.push(learningTimeline);
+  return timeline;
+}
+
+function getWriteMessageTrials(messageWritingTime, chainHolder) {
+  const timeline = [];
+  const writeMessageInstructions = {
+    type: HtmlButtonResponse,
+    stimulus: getWriteMessageInstructions(messageWritingTime),
+    choices: [],
+    trial_duration: 5000,
+  };
+  const writeMessageTrial = {
+    type: HtmlSurveyText,
+    questions: [
       {
-        type: HtmlButtonResponse,
-        stimulus: "Click the bucket where you think the coin is",
-        choices: buckets,
-        data: function () {
-          return {
-            correctBucket: jsPsych.timelineVariable("correctBucket"),
-            phase: "learning",
-          };
-        },
-        button_html: bucketHTML,
+        prompt: "Please write a message to help the next participant.",
+        placeholder: "Type your message here",
+        name: "message",
+        rows: 8,
+        columns: 60,
       },
-      {
-        type: HtmlButtonResponse,
-        stimulus: function () {
-          const lastTrial = jsPsych.data.get().last(1).values()[0];
-          const lastCorrectBucket = lastTrial["correctBucket"];
-          const lastTrialCorrect =
-            buckets[parseInt(lastTrial["response"])] == lastCorrectBucket;
-          return formatFeedback(lastCorrectBucket, lastTrialCorrect, buckets);
-        },
-        choices: ["Continue"],
-      },
-    ];
+    ],
+    trial_duration: messageWritingTime * 1000,
+    on_finish: function (data) {
+      const chain = chainHolder.item;
+      sendMessage(chain._id, data.response.message);
+    },
+    data: { phase: "writeMessage" },
+  };
+  timeline.push(writeMessageTrial);
 
-    const learningTimeline = {
-      timeline: learningStages,
-      timeline_variables: range(nTrials).map((i) => {
-        return {
-          correctBucket: sampleBucket(buckets, bucketProbs),
-        };
-      }),
-      randomize_order: true,
-    };
+  return timeline;
+}
 
-    timeline.push(learningTimeline);
-  }
-
-  if (writeMessage == 1) {
-    const writeMessageInstructions = {
-      type: HtmlButtonResponse,
-      stimulus: getWriteMessageInstructions(messageWritingTime),
-      choices: [],
-      trial_duration: 5000,
-    };
-    const writeMessageTrial = {
-      type: HtmlSurveyText,
-      questions: [
-        {
-          prompt: "Please write a message to help the next participant.",
-          placeholder: "Type your message here",
-          name: "message",
-          rows: 8,
-          columns: 60,
-        },
-      ],
-      trial_duration: messageWritingTime * 1000,
-      on_finish: function (data) {
-        sendMessage(chain._id, data.response.message);
-      },
-      data: { phase: "writeMessage" },
-    };
-    timeline.push(writeMessageTrial);
-  }
+function getTestTrials(condition) {
+  const timeline = [];
 
   timeline.push({
     type: HtmlButtonResponse,
@@ -237,6 +224,10 @@ export async function run({
     data: { phase: "test" },
   });
 
+  return timeline;
+}
+
+function getPostExperimentSurvey() {
   const postExperimentSurvey = {
     type: HtmlSurveyText,
     preamble:
@@ -264,11 +255,81 @@ export async function run({
       },
     ],
   };
-  timeline.push(postExperimentSurvey);
+  return postExperimentSurvey;
+}
+
+/**
+ * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
+ *
+ * @type {import("jspsych-builder").RunFunction}
+ */
+export async function run({
+  assetPaths,
+  input = {},
+  environment,
+  title,
+  version,
+}) {
+  // Chains to assign participants to
+  let chain = null;
+  const chainHolder = { item: chain };
+
+  const jsPsych = initJsPsych({
+    on_finish: function (data) {
+      if (!data.last(1).values()[0].failed) {
+        proliferate.submit({
+          trials: data.values(),
+        });
+      }
+    },
+    on_close: () => {
+      if (chain != null) {
+        if (chain.busy) {
+          freeChain(chain._id);
+        }
+      }
+    },
+  });
+
+  const condition = jsPsych.data.getURLVariable("condition");
+  const messageCondition = jsPsych.data.getURLVariable("mC");
+  const messageWritingTime = messageConditionTimes[messageCondition];
+  const doLearning = jsPsych.data.getURLVariable("doL");
+  const receiveMessage = jsPsych.data.getURLVariable("recM");
+  const writeMessage = jsPsych.data.getURLVariable("wM");
+  const timeline = [];
+
+  // add the initial trials
+  timeline.push(
+    ...getInitialTrials(
+      assetPaths,
+      writeMessage,
+      messageCondition,
+      messageWritingTime,
+      chainHolder,
+      jsPsych,
+    ),
+  );
+
+  // add receive message tiral
+  if (receiveMessage == 1) {
+    timeline.push(getReceiveMessageTrial(writeMessage, jsPsych, chainHolder));
+  }
+
+  // add the learning trials
+  if (doLearning == 1) {
+    timeline.push(...getLearningTrials(condition, jsPsych));
+  }
+
+  // add the message writing trials
+  if (writeMessage == 1) {
+    timeline.push(...getWriteMessageTrials(messageWritingTime, chainHolder));
+  }
+
+  // add the test trials
+  timeline.push(...getTestTrials(condition));
+
+  timeline.push(getPostExperimentSurvey());
 
   await jsPsych.run(timeline);
-
-  // Return the jsPsych instance so jsPsych Builder can access the experiment results (remove this
-  // if you handle results yourself, be it here or in `on_finish()`)
-  // return jsPsych;
 }
