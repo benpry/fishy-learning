@@ -23,7 +23,7 @@ function argmax(arr) {
   return maxIndex;
 }
 
-function getDirichletBounds(probs, n, nBuckets) {
+function getDirichletBounds(probs, n, nFishes) {
   const bounds = probs.map((p) => {
     if (p == 0) {
       return [0, 0];
@@ -43,11 +43,11 @@ function getDirichletBounds(probs, n, nBuckets) {
 
 export default function Elicitation(props) {
   const condition = props.condition;
-  const bucketNames = fishesByCondition[condition].buckets;
-  const nBuckets = bucketNames.length;
+  const fishNames = fishesByCondition[condition].fishes;
+  const nFishes = fishNames.length;
 
-  const [probs, updateProbs] = useState(Array(nBuckets).fill(1 / nBuckets));
-  const [conf, updateConf] = useState(nBuckets);
+  const [probs, updateProbs] = useState(Array(nFishes).fill(1 / nFishes));
+  const [conf, updateConf] = useState(nFishes);
 
   const handleProbChange = (i, val) => {
     let newProbs = [...probs];
@@ -63,27 +63,27 @@ export default function Elicitation(props) {
   const rowStyle = {
     display: "grid",
     margin: "auto",
-    gridTemplateColumns: `repeat(${nBuckets}, 1fr)`,
+    gridTemplateColumns: `repeat(${nFishes}, 1fr)`,
   };
 
   const itemStyle = {
     margin: "0 1rem",
   };
 
-  const bounds = getDirichletBounds(probs, conf, nBuckets);
+  const bounds = getDirichletBounds(probs, conf, nFishes);
 
   return (
     <div>
       <h1>Predict the coin distribution</h1>
       <div className="elicitation-row" style={rowStyle}>
-        {range(nBuckets).map((i) => (
+        {range(nFishes).map((i) => (
           <div key={i} style={itemStyle} className="prob-wrapper">
             <div className="prob-bar-wrapper">
               <div
                 className="prob-bar"
                 style={{
                   height: `${probs[i] * 100}%`,
-                  backgroundColor: bucketNames[i],
+                  backgroundColor: fishNames[i],
                 }}
               />
               <div
@@ -95,7 +95,7 @@ export default function Elicitation(props) {
               />
             </div>
             <div>
-              {bucketNames[i]}: {(probs[i] * 100).toFixed(0)}%<br />[
+              {fishNames[i]}: {(probs[i] * 100).toFixed(0)}%<br />[
               {(bounds[i][0] * 100).toFixed(0)}%,{" "}
               {(bounds[i][1] * 100).toFixed(0)}%]
               <input
@@ -119,7 +119,7 @@ export default function Elicitation(props) {
           key={"conf"}
           className="jspsych-slider conf-slider"
           type="range"
-          min={nBuckets}
+          min={nFishes}
           max="50"
           value={conf}
           onChange={(e) => {
