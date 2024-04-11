@@ -1,0 +1,69 @@
+/* The total length of the animation */
+@property --len {
+    syntax: "<number>";
+    initial-value: 5;
+    inherits: true;
+}
+
+/* The current timestep */
+@property --t {
+    syntax: "<number>";
+    initial-value: 5;
+    inherits: true;
+}
+/* won't be needed once Chrome supports round() */
+@property --s {
+    syntax: "<integer>";
+    initial-value: 0;
+    inherits: true;
+}
+
+.countdown {
+    /* when Chrome supports round(), this can be simplified */
+    /* more on this rounding trick
+   * https://css-tricks.com/using-absolute-value-sign-rounding-and-modulo-in-css-today/ */
+    --s: calc(var(--t) / 1);
+    display: grid;
+    margin: 0em auto;
+    width: 10em;
+    height: 10em;
+    animation: t calc(var(--len) * 1s) linear 1;
+}
+.countdown::after {
+    grid-column: 1;
+    grid-row: 1;
+    place-self: center;
+    font:
+        3em/2 ubuntu mono,
+        consolas,
+        monaco,
+        monospace;
+    counter-reset: s var(--s);
+    content: "0:" counter(s, decimal-leading-zero);
+}
+
+@keyframes t {
+    to {
+        --t: 0;
+    }
+}
+svg {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+[r] {
+    fill: none;
+    stroke: silver;
+}
+[r] + [r] {
+    --k: calc(var(--t) / var(--len));
+    transform: rotate(-90deg);
+    stroke-linecap: round;
+    stroke: color-mix(
+        in hsl shorter hue,
+        #8a9b0f calc(var(--k) * 100%),
+        #940a3d
+    );
+    stroke-dasharray: var(--k) 1;
+}

@@ -1,0 +1,110 @@
+@import "~jspsych/css/jspsych.css";
+
+.jspsych-display-element {
+    background-color: #ffffff;
+    font-size: 20px;
+}
+
+#jspsych-html-button-response-btngroup {
+    margin-top: 2rem;
+}
+
+.bucket {
+    width: 150px;
+    margin: 0 1rem;
+}
+
+.coinRow {
+    display: grid;
+    gap: 1rem;
+    margin: auto;
+}
+
+.coin {
+    width: 100px;
+    margin: auto;
+}
+
+.bucketWrapper {
+    display: inline-block;
+    margin: 0px 8px;
+    text-align: center;
+}
+
+.consent-text {
+    width: 80ch;
+    text-align: justify;
+}
+
+.instructions-text {
+    width: 60ch;
+    text-align: justify;
+}
+
+.message-text {
+    width: 50ch;
+    text-align: justify;
+    margin: 0 auto;
+}
+
+.instructions-img {
+    width: 60ch;
+}
+
+.green {
+    color: green;
+}
+
+.red {
+    color: red;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.prob-bar-wrapper {
+    position: relative;
+    height: 150px;
+    width: 50px;
+    margin: 0 auto;
+    border: 2px solid black;
+}
+
+.prob-bar {
+    position: absolute;
+    bottom: -1px;
+    left: -1px;
+    width: 100%;
+    border: 1px solid black;
+}
+
+.conf-int {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    background-color: black;
+    opacity: 0.5;
+}
+
+.prob-slider {
+    margin-top: 1rem;
+}
+
+.prob-wrapper {
+    width: 250px;
+}
+
+.confidenceBlock {
+    width: 250px;
+    margin: 0 auto;
+}
+
+img {
+    margin: 0 auto;
+    max-width: 60ch;
+}
+
+ol {
+    text-align: justify;
+}
