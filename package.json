@@ -12,6 +12,7 @@
     "@jspsych/plugin-html-keyboard-response": "^1.1.2",
     "@jspsych/plugin-instructions": "^1.1.4",
     "@jspsych/plugin-preload": "^1.1.2",
+    "@jspsych/plugin-survey-multi-choice": "^1.1.3",
     "@jspsych/plugin-survey-text": "^1.1.3",
     "dompurify": "^3.0.11",
     "file-system": "^2.2.2",

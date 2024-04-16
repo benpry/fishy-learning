@@ -15,7 +15,6 @@ export async function assignToChainNoBusy(condition) {
     mode: "cors",
   });
   const chain = await response.json();
-  console.log(chain);
   return chain;
 }
 

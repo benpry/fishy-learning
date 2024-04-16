@@ -1,5 +1,5 @@
 /**
- * @title Fish Survey
+ * @title Fishing
  * @description A learning experiment for humans
  * @version 0.1.0
  *
@@ -12,12 +12,14 @@ import HtmlButtonResponsePlugin from "@jspsych/plugin-html-keyboard-response";
 import PreloadPlugin from "@jspsych/plugin-preload";
 import InstructionsPlugin from "@jspsych/plugin-instructions";
 import HtmlButtonResponse from "@jspsych/plugin-html-button-response";
+import SurveyMultiChoice from "@jspsych/plugin-survey-multi-choice";
 import HtmlSurveyText from "./survey-text-timed";
 import { initJsPsych } from "jspsych";
 import {
   getInstructionPages,
   fishHTML,
-  formatFeedback,
+  fishingRodHTML,
+  formatCaughtFish,
   messageConditionTimes,
   nTrialsByCondition,
   fishesByCondition,
@@ -38,9 +40,36 @@ import { range } from "./utils";
 import { proliferate } from "./proliferate";
 import ElicitDistributionPlugin from "./elicit-distribution";
 
+const handleChainAssignment = () => {
+  if (writeMessage == 1) {
+    assignToChain(messageCondition).then((c) => {
+      if (c == 404) {
+        jsPsych.endExperiment(
+          "Unfortunately there is no space in the experiment at this time. We apologize for the inconvenience.",
+          { failed: true, failedReason: "noFreeChains" },
+        );
+      } else {
+        chainHolder.item = c;
+      }
+    });
+  } else if (receiveMessage == 1) {
+    assignToChainNoBusy(messageCondition).then((c) => {
+      if (c == 404) {
+        jsPsych.endExperiment(
+          "Unfortunately there is no space in the experiment at this time. We apologize for the inconvenience.",
+          { failed: true, failedReason: "noFreeChains" },
+        );
+      } else {
+        chainHolder.item = c;
+      }
+    });
+  }
+};
+
 function getInitialTrials(
   assetPaths,
   writeMessage,
+  receiveMessage,
   messageCondition,
   messageWritingTime,
   chainHolder,
@@ -61,36 +90,133 @@ function getInitialTrials(
     choices: ["I agree"],
   });
 
-  timeline.push({
+  const instructions = {
     type: InstructionsPlugin,
-    pages: getInstructionPages(writeMessage, messageWritingTime),
+    pages: getInstructionPages(
+      writeMessage,
+      receiveMessage,
+      messageWritingTime,
+    ),
     show_clickable_nav: true,
-    on_load: () => {
-      if (writeMessage == 1) {
-        assignToChain(messageCondition).then((c) => {
-          if (c == 404) {
-            jsPsych.endExperiment(
-              "Unfortunately there is no space in the experiment at this time. We apologize for the inconvenience.",
-              { failed: true, failedReason: "noFreeChains" },
-            );
-          } else {
-            chainHolder.item = c;
-          }
-        });
-      } else {
-        assignToChainNoBusy(messageCondition).then((c) => {
-          if (c == 404) {
-            jsPsych.endExperiment(
-              "Unfortunately there is no space in the experiment at this time. We apologize for the inconvenience.",
-              { failed: true, failedReason: "noFreeChains" },
-            );
-          } else {
-            chainHolder.item = c;
-          }
-        });
-      }
+  };
+
+  const qs = [
+    {
+      prompt: "All of the lakes have different proportions of fish",
+      name: "proportions",
+      options: ["true", "false"],
+      required: true,
     },
-  });
+    {
+      prompt: "Your goal is to identify the most common type of fish",
+      name: "goal",
+      options: ["true", "false"],
+      required: true,
+    },
+    {
+      prompt: "When you catch a fish, it is permanently removed from the lake",
+      name: "replacement",
+      options: ["true", "false"],
+      required: true,
+    },
+    {
+      prompt:
+        "Your bonus will depend on how accurately you predicted the proportions of fish",
+      name: "accuracy",
+      options: ["true", "false"],
+      required: true,
+    },
+    {
+      prompt:
+        "The more confident you are in your predictions, the higher your bonus",
+      name: "confidence",
+      options: ["true", "false"],
+      required: true,
+    },
+  ];
+
+  const correctAnswers = {
+    proportions: "true",
+    goal: "false",
+    replacement: "false",
+    accuracy: "true",
+    confidence: "true",
+  };
+
+  const comprehensionCheck = {
+    type: SurveyMultiChoice,
+    questions: qs,
+    data: { task: "comprehension-check" },
+  };
+
+  const comprehensionCheckFail = {
+    timeline: [
+      {
+        type: HtmlButtonResponse,
+        stimulus:
+          "<p>It seems like you did not answer all of the questions correctly. Please read the instructions carefully and try again.</p>",
+        choices: ["Continue"],
+      },
+    ],
+    conditional_function: function (data) {
+      const responses = jsPsych.data
+        .get()
+        .filter({ task: "comprehension-check" })
+        .last(1)
+        .values()[0].response;
+      const correct = Object.entries(correctAnswers).every(([key, value]) => {
+        console.log(key, value);
+        return responses[key] === value;
+      });
+      return correct ? false : true;
+    },
+  };
+
+  const comprehensionCheckPass = {
+    timeline: [
+      {
+        type: HtmlButtonResponse,
+        stimulus:
+          "<p>You passed the comprehension check! Press continue to move on to the main experiment.</p>",
+        choices: ["Continue"],
+      },
+    ],
+    conditional_function: function (data) {
+      const responses = jsPsych.data
+        .get()
+        .filter({ task: "comprehension-check" })
+        .last(1)
+        .values()[0].response;
+      const correct = Object.entries(correctAnswers).every(([key, value]) => {
+        console.log(key, value);
+        return responses[key] === value;
+      });
+      return correct;
+    },
+  };
+
+  const instructionsLoop = {
+    timeline: [
+      instructions,
+      comprehensionCheck,
+      comprehensionCheckFail,
+      comprehensionCheckPass,
+    ],
+    loop_function: function (data) {
+      const responses = jsPsych.data
+        .get()
+        .filter({ task: "comprehension-check" })
+        .last(1)
+        .values()[0].response;
+      const correct = Object.entries(correctAnswers).every(([key, value]) => {
+        console.log(key, value);
+        return responses[key] === value;
+      });
+      return correct ? false : true;
+    },
+  };
+
+  timeline.push(instructionsLoop);
 
   return timeline;
 }
@@ -140,24 +266,20 @@ function getLearningTrials(condition, jsPsych) {
   const learningStages = [
     {
       type: HtmlButtonResponse,
-      stimulus: "Click the fish where you think the coin is",
-      choices: fishes,
+      stimulus: "Click the fishing rod to catch a fish",
+      choices: ["fish"],
       data: function () {
         return {
-          correctFish: jsPsych.timelineVariable("correctFish"),
           phase: "learning",
         };
       },
-      button_html: fishHTML,
+      button_html: fishingRodHTML,
     },
     {
       type: HtmlButtonResponse,
       stimulus: function () {
-        const lastTrial = jsPsych.data.get().last(1).values()[0];
-        const lastCorrectFish = lastTrial["correctFish"];
-        const lastTrialCorrect =
-          fishes[parseInt(lastTrial["response"])] == lastCorrectFish;
-        return formatFeedback(lastCorrectFish, lastTrialCorrect, fishes);
+        const caughtFish = jsPsych.timelineVariable("fishCaught");
+        return formatCaughtFish(caughtFish);
       },
       choices: ["Continue"],
     },
@@ -167,7 +289,7 @@ function getLearningTrials(condition, jsPsych) {
     timeline: learningStages,
     timeline_variables: range(nTrials).map((i) => {
       return {
-        correctFish: sampleFish(fishes, fishProbs),
+        fishCaught: sampleFish(fishes, fishProbs),
       };
     }),
     randomize_order: true,
@@ -304,6 +426,7 @@ export async function run({
     ...getInitialTrials(
       assetPaths,
       writeMessage,
+      receiveMessage,
       messageCondition,
       messageWritingTime,
       chainHolder,

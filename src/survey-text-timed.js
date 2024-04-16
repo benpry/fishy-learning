@@ -183,7 +183,6 @@ class SurveyTextPlugin {
     // backup in case autofocus doesn't work
 
     const end_trial = () => {
-      console.log("in end trial");
       // measure response time
       var endTime = performance.now();
       var response_time = Math.round(endTime - startTime);
