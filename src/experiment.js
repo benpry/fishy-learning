@@ -109,7 +109,7 @@ function getInitialTrials(
       required: true,
     },
     {
-      prompt: "Your goal is to identify the most common type of fish",
+      prompt: "Your goal is only to identify the most common type of fish",
       name: "goal",
       options: ["true", "false"],
       required: true,
@@ -146,6 +146,8 @@ function getInitialTrials(
 
   const comprehensionCheck = {
     type: SurveyMultiChoice,
+    preamble:
+      "Please answer the following questions before you begin the experiment.",
     questions: qs,
     data: { task: "comprehension-check" },
   };
@@ -154,8 +156,7 @@ function getInitialTrials(
     timeline: [
       {
         type: HtmlButtonResponse,
-        stimulus:
-          "<p>It seems like you did not answer all of the questions correctly. Please read the instructions carefully and try again.</p>",
+        stimulus: `<p class="instructions-text">It seems like you did not answer all of the questions correctly. Please read the instructions carefully and try again.</p>`,
         choices: ["Continue"],
       },
     ],
@@ -176,8 +177,7 @@ function getInitialTrials(
     timeline: [
       {
         type: HtmlButtonResponse,
-        stimulus:
-          "<p>You passed the comprehension check! Press continue to move on to the main experiment.</p>",
+        stimulus: `<p class="instructions-text">You answered all the questions correctly! Press 'Continue' to move on to the practice round.</p>`,
         choices: ["Continue"],
       },
     ],
@@ -265,7 +265,7 @@ function getLearningTrials(condition, jsPsych) {
 
   timeline.push({
     type: HtmlButtonResponse,
-    stimulus: `<p>You will now start the learning trials. Press "continue" to begin.</p>`,
+    stimulus: `<p>You will now start the learning trials. Press 'Continue' to begin.</p>`,
     choices: ["Continue"],
   });
 
@@ -388,6 +388,13 @@ function getPostExperimentSurvey() {
 
 function getPracticeRound(doLearning, writeMessage, receiveMessage, jsPsych) {
   const practiceTimeline = [];
+
+  practiceTimeline.push({
+    type: HtmlButtonResponse,
+    stimulus: `<p class="instructions-text">This is a practice round for you to complete before you begin the main experiment.</p>`,
+    choices: ["Continue"],
+  });
+
   if (receiveMessage == 1) {
     practiceTimeline.push({
       type: HtmlButtonResponse,
@@ -440,7 +447,7 @@ function getPracticeRound(doLearning, writeMessage, receiveMessage, jsPsych) {
 
   practiceTimeline.push({
     type: HtmlButtonResponse,
-    stimulus: `<p>Great job! You have completed the practice round. Press "continue" to begin the main experiment.</p>`,
+    stimulus: `<p>Great job! You have completed the practice round. Press 'Continue' to begin the main experiment.</p>`,
     choices: ["Continue"],
   });
 

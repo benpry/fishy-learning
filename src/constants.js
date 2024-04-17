@@ -32,9 +32,10 @@ export const colors = {
   "light grey": "#bbbbbb",
   "dark grey": "#666666",
   blue: "#4477aa",
+  yellow: "#ccbb44",
   purple: "#aa3377",
   green: "#228833",
-  white: "#000000",
+  white: "#FFFFFF",
   red: "#ee6677",
   black: "#222222",
 };
@@ -62,7 +63,7 @@ export const fishesByCondition = {
     probs: [0.2, 0.8],
   },
   2: {
-    fishes: ["purple", "green", "white"],
+    fishes: ["yellow", "green", "white"],
     probs: [0.1, 0.7, 0.2],
   },
   3: {
@@ -82,7 +83,7 @@ const lakeNames = {
   3: "Lake Gorp",
 };
 
-const timeEstimate = 3;
+const timeEstimate = 5;
 const basePayment = 1;
 const maxBonus = 1;
 
@@ -123,9 +124,9 @@ export const getBlockHeaderHTML = (condition) => {
   return `<h1>${lakeNames[condition]}</h1>
 <p class="instructions-text">You are now visiting ${
     lakeNames[condition]
-  }. There are ${nFishes} fish in the lake. The fish in this lake are ${fishNames.join(
-    ", ",
-  )}.</p>
+  }. There are ${
+    fishNames.length
+  } types of fish in the lake. They are:\n${fishNames.join(", ")}.</p>
 ${fishImages}`;
 };
 
