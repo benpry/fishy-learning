@@ -81,10 +81,10 @@
 
 .conf-int {
     position: absolute;
-    left: 0;
-    width: 100%;
+    left: calc(50% - 2px);
+    width: 4px;
     background-color: black;
-    opacity: 0.5;
+    opacity: 0.8;
 }
 
 .prob-slider {
@@ -107,4 +107,8 @@ img {
 
 ol {
     text-align: justify;
+}
+
+body {
+    background-color: #fffffb !important;
 }

@@ -18,17 +18,32 @@ export const formatCaughtFish = (fishColor) => {
     <div class="feedback-message">
     You caught a ${fishColor} fish!
     </div>
-    <img src="assets/images/${fishColor}-fish.svg" class="fish"/>
+    <img src="assets/images/${fishColor.replace(
+      " ",
+      "-",
+    )}-fish.svg" class="fish"/>
     </div>
     </div>
     `;
 };
 
+export const colors = {
+  cyan: "#66ccee",
+  "light grey": "#bbbbbb",
+  "dark grey": "#666666",
+  blue: "#4477aa",
+  purple: "#aa3377",
+  green: "#228833",
+  white: "#000000",
+  red: "#ee6677",
+  black: "#222222",
+};
+
 export const nTrialsByCondition = {
-  0: 5,
-  1: 5,
-  2: 5,
-  3: 5,
+  0: 10,
+  1: 10,
+  2: 10,
+  3: 10,
 };
 
 export const messageConditionTimes = {
@@ -39,11 +54,11 @@ export const messageConditionTimes = {
 
 export const fishesByCondition = {
   0: {
-    fishes: ["cyan", "light-grey"],
+    fishes: ["cyan", "light grey"],
     probs: [0.8, 0.2],
   },
   1: {
-    fishes: ["dark-grey", "blue"],
+    fishes: ["dark grey", "blue"],
     probs: [0.2, 0.8],
   },
   2: {
@@ -54,6 +69,17 @@ export const fishesByCondition = {
     fishes: ["red", "black", "purple"],
     probs: [0.2, 0.1, 0.7],
   },
+  "-1": {
+    fishes: ["blue", "red"],
+    probs: [0.33, 0.67],
+  },
+};
+
+const lakeNames = {
+  0: "Lake Blicket",
+  1: "Lake Dax",
+  2: "Lake Fep",
+  3: "Lake Gorp",
 };
 
 const timeEstimate = 3;
@@ -86,6 +112,21 @@ export const getInstructionPages = (
     );
     return individualHtml.split("<hr/>");
   }
+};
+
+export const getBlockHeaderHTML = (condition) => {
+  const nFishes = nTrialsByCondition[condition];
+  const fishNames = fishesByCondition[condition].fishes;
+  const fishImages = fishNames
+    .map((fish) => fishHTML.replace("%choice%", fish.replace(" ", "-")))
+    .join("\n");
+  return `<h1>${lakeNames[condition]}</h1>
+<p class="instructions-text">You are now visiting ${
+    lakeNames[condition]
+  }. There are ${nFishes} fish in the lake. The fish in this lake are ${fishNames.join(
+    ", ",
+  )}.</p>
+${fishImages}`;
 };
 
 export const testPhaseInstructions = eval(

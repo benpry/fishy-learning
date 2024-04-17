@@ -1,6 +1,6 @@
 import React from "react";
 import { range } from "./utils";
-import { fishesByCondition } from "./constants";
+import { fishesByCondition, colors } from "./constants";
 import { useState } from "react";
 var { jStat } = require("jstat");
 
@@ -74,7 +74,7 @@ export default function Elicitation(props) {
 
   return (
     <div>
-      <h1>Predict the coin distribution</h1>
+      <h1>Report your findings</h1>
       <div className="elicitation-row" style={rowStyle}>
         {range(nFishes).map((i) => (
           <div key={i} style={itemStyle} className="prob-wrapper">
@@ -83,7 +83,7 @@ export default function Elicitation(props) {
                 className="prob-bar"
                 style={{
                   height: `${probs[i] * 100}%`,
-                  backgroundColor: fishNames[i],
+                  backgroundColor: colors[fishNames[i]],
                 }}
               />
               <div
@@ -95,9 +95,10 @@ export default function Elicitation(props) {
               />
             </div>
             <div>
-              {fishNames[i]}: {(probs[i] * 100).toFixed(0)}%<br />[
-              {(bounds[i][0] * 100).toFixed(0)}%,{" "}
-              {(bounds[i][1] * 100).toFixed(0)}%]
+              {fishNames[i]}: {(probs[i] * 100).toFixed(0)}
+              <br />
+              {(bounds[i][0] * 100).toFixed(0)} to
+              {` ${(bounds[i][1] * 100).toFixed(0)}`}
               <input
                 className="jspsych-slider prob-slider"
                 key={i}
@@ -136,9 +137,9 @@ export default function Elicitation(props) {
       </button>
       <div className="elicitationInstructions">
         <p className="instructions-text">
-          Remember, the shaded region should cover 95% of what you think the
-          probabilty might be. You will earn a bonus if the true probabilities
-          fall in the region, and a larger bonus the smaller the region is.
+          Report how many fish of each type you think are in the lake. Remember
+          that there are 100 fish in total. Adjust your confidence so that you
+          are 95% sure it covers the true number of fish of each type.
         </p>
         <p className="instructions-text">
           Press "Submit" when you are happy with your prediction.

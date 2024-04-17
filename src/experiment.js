@@ -26,6 +26,7 @@ import {
   consentText,
   testPhaseInstructions,
   getWriteMessageInstructions,
+  getBlockHeaderHTML,
 } from "./constants";
 import {
   assignToChain,
@@ -35,7 +36,7 @@ import {
   updateReads,
 } from "./api";
 import { startTimer } from "./timer";
-import { sampleFish, renderMessage } from "./utils";
+import { shuffle, sampleFish, renderMessage } from "./utils";
 import { range } from "./utils";
 import { proliferate } from "./proliferate";
 import ElicitDistributionPlugin from "./elicit-distribution";
@@ -165,7 +166,6 @@ function getInitialTrials(
         .last(1)
         .values()[0].response;
       const correct = Object.entries(correctAnswers).every(([key, value]) => {
-        console.log(key, value);
         return responses[key] === value;
       });
       return correct ? false : true;
@@ -188,7 +188,6 @@ function getInitialTrials(
         .last(1)
         .values()[0].response;
       const correct = Object.entries(correctAnswers).every(([key, value]) => {
-        console.log(key, value);
         return responses[key] === value;
       });
       return correct;
@@ -209,7 +208,6 @@ function getInitialTrials(
         .last(1)
         .values()[0].response;
       const correct = Object.entries(correctAnswers).every(([key, value]) => {
-        console.log(key, value);
         return responses[key] === value;
       });
       return correct ? false : true;
@@ -219,6 +217,14 @@ function getInitialTrials(
   timeline.push(instructionsLoop);
 
   return timeline;
+}
+
+function getBlockHeader(condition) {
+  return {
+    type: HtmlButtonResponse,
+    stimulus: getBlockHeaderHTML(condition),
+    choices: ["Continue"],
+  };
 }
 
 function getReceiveMessageTrial(writeMessage, jsPsych, chainHolder) {
@@ -380,6 +386,67 @@ function getPostExperimentSurvey() {
   return postExperimentSurvey;
 }
 
+function getPracticeRound(doLearning, writeMessage, receiveMessage, jsPsych) {
+  const practiceTimeline = [];
+  if (receiveMessage == 1) {
+    practiceTimeline.push({
+      type: HtmlButtonResponse,
+      stimulus: renderMessage("This is a test message."),
+      choices: ["Continue"],
+    });
+  }
+  if (doLearning == 1) {
+    practiceTimeline.push({
+      type: HtmlButtonResponse,
+      stimulus: `<p>You will now start the learning trials. Press "continue" to begin.</p>`,
+      choices: ["Continue"],
+    });
+
+    const learningStages = [
+      {
+        type: HtmlButtonResponse,
+        stimulus: "Click the fishing rod to catch a fish",
+        choices: ["fish"],
+        data: function () {
+          return {
+            phase: "learning",
+          };
+        },
+        button_html: fishingRodHTML,
+      },
+      {
+        type: HtmlButtonResponse,
+        stimulus: function () {
+          const caughtFish = jsPsych.timelineVariable("fishCaught");
+          return formatCaughtFish(caughtFish);
+        },
+        choices: ["Continue"],
+      },
+    ];
+
+    const learningTimeline = {
+      timeline: learningStages,
+      timeline_variables: ["red", "blue", "red", "red", "red"].map((f) => {
+        return {
+          fishCaught: f,
+        };
+      }),
+      randomize_order: false,
+    };
+    practiceTimeline.push(learningTimeline);
+  }
+
+  practiceTimeline.push(...getTestTrials(-1));
+
+  practiceTimeline.push({
+    type: HtmlButtonResponse,
+    stimulus: `<p>Great job! You have completed the practice round. Press "continue" to begin the main experiment.</p>`,
+    choices: ["Continue"],
+  });
+
+  return practiceTimeline;
+}
+
 /**
  * This function will be executed by jsPsych Builder and is expected to run the jsPsych experiment
  *
@@ -413,7 +480,7 @@ export async function run({
     },
   });
 
-  const condition = jsPsych.data.getURLVariable("condition");
+  const conditions = [0, 1, 2, 3];
   const messageCondition = jsPsych.data.getURLVariable("mC");
   const messageWritingTime = messageConditionTimes[messageCondition];
   const doLearning = jsPsych.data.getURLVariable("doL");
@@ -434,23 +501,43 @@ export async function run({
     ),
   );
 
-  // add receive message tiral
-  if (receiveMessage == 1) {
-    timeline.push(getReceiveMessageTrial(writeMessage, jsPsych, chainHolder));
-  }
+  timeline.push(
+    ...getPracticeRound(doLearning, writeMessage, receiveMessage, jsPsych),
+  );
 
-  // add the learning trials
-  if (doLearning == 1) {
-    timeline.push(...getLearningTrials(condition, jsPsych));
-  }
+  shuffle(conditions);
+  for (let condition of conditions) {
+    let blockTimeline = [];
 
-  // add the message writing trials
-  if (writeMessage == 1) {
-    timeline.push(...getWriteMessageTrials(messageWritingTime, chainHolder));
-  }
+    blockTimeline.push(getBlockHeader(condition));
 
-  // add the test trials
-  timeline.push(...getTestTrials(condition));
+    // add receive message tiral
+    if (receiveMessage == 1) {
+      blockTimeline.push(
+        getReceiveMessageTrial(writeMessage, jsPsych, chainHolder),
+      );
+    }
+
+    // add the learning trials
+    if (doLearning == 1) {
+      blockTimeline.push(...getLearningTrials(condition, jsPsych));
+    }
+
+    // add the message writing trials
+    if (writeMessage == 1) {
+      blockTimeline.push(
+        ...getWriteMessageTrials(messageWritingTime, chainHolder),
+      );
+    }
+
+    // add the test trials
+    blockTimeline.push(...getTestTrials(condition));
+
+    timeline.push({
+      timeline: blockTimeline,
+      timeline_variables: [{ condition: condition }],
+    });
+  }
 
   timeline.push(getPostExperimentSurvey());
 
