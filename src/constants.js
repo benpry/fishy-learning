@@ -77,10 +77,10 @@ export const fishesByCondition = {
 };
 
 const lakeNames = {
-  0: "Lake Blicket",
-  1: "Lake Dax",
-  2: "Lake Fep",
-  3: "Lake Gorp",
+  0: "Lake Kuolmo",
+  1: "Lake Onki",
+  2: "Lake Pihla",
+  3: "Lake Jonu",
 };
 
 const timeEstimate = 5;
