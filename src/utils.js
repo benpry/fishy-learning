@@ -47,3 +47,25 @@ export function renderMessage(message) {
    <p class="instructions-text">Press "Continue" when you have finished reading.</p>
 `;
 }
+
+export function startTimer(timeLimit) {
+  let secondsLeft = timeLimit;
+  // add a timer to the html
+  const timer = document.createElement("div");
+  timer.innerHTML = `${secondsLeft} seconds remaining`;
+  document
+    .getElementById("jspsych-content")
+    .insertBefore(timer, document.getElementById("jspsych-content").firstChild);
+
+  const x = setInterval(function () {
+    if (timer === null) {
+      clearInterval(x);
+      return;
+    }
+    secondsLeft -= 1;
+    timer.innerHTML = `${secondsLeft} seconds remaining`;
+    if (secondsLeft <= 0) {
+      clearInterval(x);
+    }
+  }, 1000);
+}

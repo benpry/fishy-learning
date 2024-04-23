@@ -33,8 +33,8 @@ function getDirichletBounds(probs, n, nFishes) {
       const alpha = p * n;
       const beta = (1 - p) * n;
       return [
-        jStat.beta.inv(0.025, alpha, beta),
-        jStat.beta.inv(0.975, alpha, beta),
+        jStat.beta.inv(0.25, alpha, beta),
+        jStat.beta.inv(0.75, alpha, beta),
       ];
     }
   });
@@ -42,8 +42,8 @@ function getDirichletBounds(probs, n, nFishes) {
 }
 
 export default function Elicitation(props) {
-  const condition = props.condition;
-  const fishNames = fishesByCondition[condition].fishes;
+  const stimulusCondition = props.stimulusCondition;
+  const fishNames = fishesByCondition[stimulusCondition].fishes;
   const nFishes = fishNames.length;
 
   const [probs, updateProbs] = useState(Array(nFishes).fill(1 / nFishes));
@@ -51,9 +51,6 @@ export default function Elicitation(props) {
 
   const handleProbChange = (i, val) => {
     let newProbs = [...probs];
-    if (argmax(probs) == i && probs[i] == 1 && val < probs[i]) {
-      newProbs = newProbs.map((p) => p + 0.001);
-    }
     newProbs[i] = val;
     // normalize probs
     const sum = newProbs.reduce((a, b) => a + b, 0);
@@ -103,8 +100,8 @@ export default function Elicitation(props) {
                 className="jspsych-slider prob-slider"
                 key={i}
                 type="range"
-                min="0"
-                max="100"
+                min="1"
+                max="99"
                 value={(probs[i] * 100).toFixed(0)}
                 onChange={(e) => {
                   handleProbChange(i, e.target.value / 100);
@@ -114,7 +111,14 @@ export default function Elicitation(props) {
           </div>
         ))}
       </div>
-      <div className="confidenceBlock">
+      <div
+        className="confidenceBlock jspsych-html-slider-response-container"
+        style={{
+          position: "relative",
+          margin: "0 auto 3em auto",
+          width: "500px",
+        }}
+      >
         Confidence:
         <input
           key={"conf"}
@@ -128,6 +132,32 @@ export default function Elicitation(props) {
             updateConf(newConf);
           }}
         />
+        <div style={{ fontSize: "medium" }}>
+          <div
+            style={{
+              border: "1px solid transparent",
+              display: "inline-block",
+              position: "absolute",
+              left: "calc( 0% - (50% / 2) - 7.5px)",
+              textAlign: "center",
+              width: "50%",
+            }}
+          >
+            Not confident
+          </div>
+          <div
+            style={{
+              border: "1px solid transparent",
+              display: "inline-block",
+              position: "absolute",
+              left: "calc( 100% - (50% / 2) - 7.5px)",
+              textAlign: "center",
+              width: "50%",
+            }}
+          >
+            Highly confident
+          </div>
+        </div>
       </div>
       <button
         className="jspsych-btn"
@@ -139,7 +169,7 @@ export default function Elicitation(props) {
         <p className="instructions-text">
           Report how many fish of each type you think are in the lake. Remember
           that there are 100 fish in total. Adjust your confidence so that you
-          are 95% sure it covers the true number of fish of each type.
+          are 50% sure it covers the true number of fish of each type.
         </p>
         <p className="instructions-text">
           Press "Submit" when you are happy with your prediction.

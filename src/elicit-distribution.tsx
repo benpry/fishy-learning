@@ -7,9 +7,9 @@ const info = {
   name: "elicit-distribution",
   parameters: {
     /** If true, then trial will end when user responds. */
-    condition: {
+    stimulusCondition: {
       type: ParameterType.INT,
-      pretty_name: "Condition",
+      pretty_name: "Stimulus condition",
     },
   },
 };
@@ -80,7 +80,10 @@ class ElicitDistributionPlugin implements JsPsychPlugin<Info> {
 
     const root = createRoot(node);
     root.render(
-      <Elicitation submitFn={after_response} condition={trial.condition} />,
+      <Elicitation
+        submitFn={after_response}
+        stimulusCondition={trial.stimulusCondition}
+      />,
     );
   }
 }

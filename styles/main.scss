@@ -84,6 +84,7 @@
     left: calc(50% - 2px);
     width: 4px;
     background-color: black;
+    border: 1px solid white;
     opacity: 0.8;
 }
 
@@ -96,7 +97,7 @@
 }
 
 .confidenceBlock {
-    width: 250px;
+    width: 500px;
     margin: 0 auto;
 }
 

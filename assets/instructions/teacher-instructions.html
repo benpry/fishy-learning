@@ -1,68 +1,81 @@
 <p class="instructions-text">
-  In this experiment, a machine drops coins into buckets with different
-  probabilities. Your goal is to learn how likely the coin is to be in each
-  bucket. The experiment consists of four phases:
+  In this experiment, you will play the role of a wildlife researcher who is
+  studying fish populations in different lakes. You will visit four lakes that
+  each have <strong>100 fish</strong> in them. There are different types of fish
+  in each lake. Your goal is to learn about
+  <strong>how many of each type of fish</strong> live in the lakes.
 </p>
 
-<p class="instructions-text">
-<ol>
-  <li>Reading a message from a previous participant</li>
-  <li>Completing learning trials</li>
+<p class="instructions-text">The experiment consists of three phases</p>
+
+<ol class="instructions-text">
+  <li>Catching and observing fish</li>
   <li>Writing a message for the next participant</li>
-  <li>Predicting how likely the coin is to be in each bucket</li>
+  <li>Predicting the distribution of fish in the lake</li>
 </ol>
-</p>
 
-<hr/>
-
-<p class="instructions-text">
-    In the first phase of the experiment, you will <strong>read a message</strong> from a
-  previous participant who saw the same buckets. The previous participant was
-  instructed to write a message that helps you learn about the probabilities,
-  but they only had ${messageWritingTime} seconds to write the message.
-</p>
-
-<hr/>
+<hr />
 
 <p class="instructions-text">
-  You will then learn more about how likely the coin is to be in each bucket
-  through a series of <strong>learning trials</strong>. In each learning trial, one of the
-  buckets will have a coin in it. You should <strong>click the bucket</strong> where you
-  think the coin is, then you will see where the coin actually is.
+  When you first visit a lake, you will go fishing. You will catch a series of
+  fish. After catching a fish, you
+  <strong>release it back into the lake</strong>. In this phase, you should
+  click the fishing rod to go fishing. You will then see which type of fish you
+  caught.
+</p>
+
+<img src="../images/fishing-rod.svg" , alt="Fishing rod" , style="width: 25%" />
+<br />
+<img src="../images/red-fish.svg" , alt="red fish" , style="width: 25%" />
+<img src="../images/blue-fish.svg" , alt="blue fish" , style="width: 25%" />
+
+<p class="instructions-text">
+  You will not be able to see which type of fish you caught after you release
+  them, so make sure you <strong>remember which fish you caught</strong>.
+</p>
+
+<hr />
+
+<p class="instructions-text">
+  After catching some fish, you will need to leave the lake. Before you leave,
+  you will have the opportunity to <strong>write a message</strong> for the next
+  participant.
 </p>
 
 <p class="instructions-text">
-  The buckets all have the same probability of having the coin in every trial.
-  The image below shows a learning trial where the coin is in the red bucket.
+  The next participant will also try to learn the distribution of fish in the
+  same lake. You should write a message that will help them do that. However,
+  you will only have
+  <strong>${messageWritingTime} seconds</strong> to write your message.
 </p>
-
-<img src="../images/learning-trial-screenshot.png" />
-
-<hr/>
 
 <p class="instructions-text">
-  Finally, you will be asked to predict how likely a coin is to be in each
-  bucket. Imagine a million coins were dropped into buckets, what percentage of
-  them do you think would fall in each of the buckets?
+  Your bonus will depend on the performance of the participant who reads your
+  message, so make sure to write a helpful message!
 </p>
 
-<p class="instructions-text">You will make a prediction using this interface:</p>
+<hr />
+
+<p class="instructions-text">
+  Finally, you will report your findings. You will be asked to predict how many
+  fish of each color there are in the lake, along with how confident you are in
+  that prediction.
+</p>
+
+<p class="instructions-text">
+  You will make a prediction using an interface that looks like this:
+</p>
 
 <img
   src="../images/elicitation-screenshot.png"
-  alt="Elicitation Screenshot"
+  alt="Screenshot of the prediction interface"
   style="width: 100%; max-width: 600px"
 />
 
 <p class="instructions-text">
-  The interface asks you to report your confidence along with probabilities. You
-  should use the slider to adjust your confidence so that are <strong>95% sure</strong> that
-  the true probability is in the shaded region. You will earn a <strong>bonus</strong> if the
-  true probability is in the shaded region. Your bonus will be larger the
-  smaller the region is.
-</p>
-
-<p class="instructions-text">
-  Press "Next" when you are ready to see the message that a previous participant
-  left for you.
+  In addition to predicting the numbers of fish, you will be asked to specify a
+  range that you are 50% sure contains the true numbers of fish. You will earn a
+  <strong>bonus</strong> if the true numbers of fish fall in the range you
+  specify. Your bonus will be larger the smaller your range is (i.e. the more
+  confident you are in the prediction).
 </p>

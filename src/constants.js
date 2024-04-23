@@ -55,7 +55,7 @@ export const messageConditionTimes = {
 
 export const fishesByCondition = {
   0: {
-    fishes: ["cyan", "light grey"],
+    fishes: ["white", "purple"],
     probs: [0.8, 0.2],
   },
   1: {
@@ -63,11 +63,11 @@ export const fishesByCondition = {
     probs: [0.2, 0.8],
   },
   2: {
-    fishes: ["yellow", "green", "white"],
+    fishes: ["yellow", "light grey", "green"],
     probs: [0.1, 0.7, 0.2],
   },
   3: {
-    fishes: ["red", "black", "purple"],
+    fishes: ["red", "black", "cyan"],
     probs: [0.2, 0.1, 0.7],
   },
   "-1": {
