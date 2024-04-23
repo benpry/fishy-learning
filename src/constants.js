@@ -60,7 +60,7 @@ export const fishesByCondition = {
   },
   1: {
     fishes: ["dark grey", "blue"],
-    probs: [0.2, 0.8],
+    probs: [0.4, 0.6],
   },
   2: {
     fishes: ["yellow", "light grey", "green"],
@@ -68,11 +68,11 @@ export const fishesByCondition = {
   },
   3: {
     fishes: ["red", "black", "cyan"],
-    probs: [0.2, 0.1, 0.7],
+    probs: [0.35, 0.15, 0.5],
   },
   "-1": {
     fishes: ["blue", "red"],
-    probs: [0.33, 0.67],
+    probs: [0.36, 0.74],
   },
 };
 
