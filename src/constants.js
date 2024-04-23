@@ -83,7 +83,7 @@ const lakeNames = {
   3: "Lake Jonu",
 };
 
-const timeEstimate = 5;
+const timeEstimate = 10;
 const basePayment = 1;
 const maxBonus = 1;
 

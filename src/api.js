@@ -6,8 +6,6 @@ export async function assignToChain(condition) {
     mode: "cors",
   });
   const chain = await response.json();
-  console.log("response");
-  console.log(chain);
   return chain;
 }
 

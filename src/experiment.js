@@ -47,11 +47,8 @@ const handleChainAssignment = (
   writeMessage,
   chainHolder,
 ) => {
-  console.log("handling chain assignment");
   const conditionStr = `s${stimulusCondition}m${messageCondition}`;
   if (writeMessage == 1) {
-    console.log("assigning to chain and marking as busy");
-    console.log(conditionStr);
     assignToChain(conditionStr).then((c) => {
       if (c == 404) {
         jsPsych.endExperiment(
@@ -63,7 +60,6 @@ const handleChainAssignment = (
       }
     });
   } else if (receiveMessage == 1) {
-    console.log("assigning to chain but not marking as busy");
     assignToChainNoBusy(conditionStr).then((c) => {
       if (c == 404) {
         jsPsych.endExperiment(
@@ -349,6 +345,8 @@ function getWriteMessageTrials(
     choices: [],
     trial_duration: 5000,
   };
+  timeline.push(writeMessageInstructions);
+
   const writeMessageTrial = {
     type: HtmlSurveyText,
     questions: [
@@ -425,7 +423,13 @@ function getPostExperimentSurvey() {
   return postExperimentSurvey;
 }
 
-function getPracticeRound(doLearning, writeMessage, receiveMessage, jsPsych) {
+function getPracticeRound(
+  doLearning,
+  writeMessage,
+  receiveMessage,
+  messageWritingTime,
+  jsPsych,
+) {
   const practiceTimeline = [];
 
   practiceTimeline.push({
@@ -488,6 +492,35 @@ function getPracticeRound(doLearning, writeMessage, receiveMessage, jsPsych) {
       randomize_order: false,
     };
     practiceTimeline.push(learningTimeline);
+  }
+
+  if (writeMessage == 1) {
+    const writeMessageInstructions = {
+      type: HtmlButtonResponse,
+      stimulus: getWriteMessageInstructions(messageWritingTime),
+      choices: [],
+      trial_duration: 5000,
+    };
+    practiceTimeline.push(writeMessageInstructions);
+
+    const writeMessageTrial = {
+      type: HtmlSurveyText,
+      questions: [
+        {
+          prompt: "Please write a message to help the next participant.",
+          placeholder: "Type your message here",
+          name: "message",
+          rows: 8,
+          columns: 60,
+        },
+      ],
+      trial_duration: messageWritingTime * 1000,
+      on_load: () => {
+        startTimer(messageWritingTime);
+      },
+      data: { phase: "writeMessage", stimulusCondition: -1 },
+    };
+    practiceTimeline.push(writeMessageTrial);
   }
 
   practiceTimeline.push(...getTestTrials(-1));
@@ -592,7 +625,13 @@ export async function run({
   );
 
   timeline.push(
-    ...getPracticeRound(doLearning, writeMessage, receiveMessage, jsPsych),
+    ...getPracticeRound(
+      doLearning,
+      writeMessage,
+      receiveMessage,
+      messageWritingTime,
+      jsPsych,
+    ),
   );
 
   shuffle(stimulusConditions);
