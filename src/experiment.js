@@ -35,7 +35,13 @@ import {
   sendMessage,
   updateReads,
 } from "./api";
-import { shuffle, sampleFish, renderMessage, startTimer } from "./utils";
+import {
+  shuffle,
+  sampleFish,
+  renderMessage,
+  startTimer,
+  startPreWritingTimer,
+} from "./utils";
 import { range } from "./utils";
 import { proliferate } from "./proliferate";
 import ElicitDistributionPlugin from "./elicit-distribution";
@@ -128,15 +134,15 @@ function getInitialTrials(
     },
     {
       prompt:
-        "Your bonus will depend on how accurately you predicted the proportions of fish",
-      name: "accuracy",
+        "The more confident you are in your predictions, the higher your potential bonus will be.",
+      name: "confidence",
       options: ["true", "false"],
       required: true,
     },
     {
       prompt:
-        "The more confident you are in your predictions, the higher your potential bonus will be.",
-      name: "confidence",
+        "You will still earn an individual bonus if the true numbers of fish fall outside of the range you predict.",
+      name: "confidenceRange",
       options: ["true", "false"],
       required: true,
     },
@@ -146,8 +152,8 @@ function getInitialTrials(
     proportions: "true",
     goal: "false",
     replacement: "false",
-    accuracy: "true",
     confidence: "true",
+    confidenceRange: "false",
   };
 
   const comprehensionCheck = {
@@ -278,7 +284,7 @@ function getReceiveMessageTrial(writeMessage, jsPsych, chainHolder) {
 function getLearningTrials(stimulusCondition, jsPsych) {
   const fishes = fishesByCondition[stimulusCondition].fishes;
   // const nTrials = nTrialsByCondition[stimulusCondition];
-  const nTrials = Math.floor(Math.random() * 18) + 2;
+  const nTrials = Math.floor(Math.random() * 9) + 1;
   const fishProbs = fishesByCondition[stimulusCondition].probs;
 
   const timeline = [];
@@ -342,8 +348,11 @@ function getWriteMessageTrials(
   const writeMessageInstructions = {
     type: HtmlButtonResponse,
     stimulus: getWriteMessageInstructions(messageWritingTime),
+    on_load: () => {
+      startPreWritingTimer(3);
+    },
     choices: [],
-    trial_duration: 5000,
+    trial_duration: 3000,
   };
   timeline.push(writeMessageInstructions);
 
@@ -404,6 +413,12 @@ function getPostExperimentSurvey() {
         rows: 6,
         columns: 50,
         name: "strategy",
+      },
+      {
+        prompt: "How did you decide how to set the confidence slider?",
+        rows: 6,
+        columns: 50,
+        name: "confidence",
       },
       {
         prompt: "Were any of the instructions unclear?",
@@ -498,8 +513,11 @@ function getPracticeRound(
     const writeMessageInstructions = {
       type: HtmlButtonResponse,
       stimulus: getWriteMessageInstructions(messageWritingTime),
+      on_load: () => {
+        startPreWritingTimer(3);
+      },
       choices: [],
-      trial_duration: 5000,
+      trial_duration: 3000,
     };
     practiceTimeline.push(writeMessageInstructions);
 

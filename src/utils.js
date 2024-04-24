@@ -69,3 +69,19 @@ export function startTimer(timeLimit) {
     }
   }, 1000);
 }
+
+export function startPreWritingTimer(timeLimit) {
+  const timingParagraph = document.getElementById("message-seconds-counter");
+  let secondsLeft = timeLimit;
+  const x = setInterval(function () {
+    if (timingParagraph === null) {
+      clearInterval(x);
+      return;
+    }
+    secondsLeft -= 1;
+    timingParagraph.innerHTML = `Your message writing time will begin in ${secondsLeft} seconds`;
+    if (timeLimit <= 0) {
+      clearInterval(x);
+    }
+  }, 1000);
+}

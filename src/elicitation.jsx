@@ -167,9 +167,10 @@ export default function Elicitation(props) {
       </button>
       <div className="elicitationInstructions">
         <p className="instructions-text">
-          Report how many fish of each type you think are in the lake. Remember
-          that there are 100 fish in total. Adjust your confidence so that you
-          are 50% sure it covers the true number of fish of each type.
+          Use the sliders above to report a range that you are 50% confident
+          covers the true number of each type of fish. Remember that you will
+          get a bonus if your range covers the true number, and your bonus will
+          be larger the more confident you are in your predictions.
         </p>
         <p className="instructions-text">
           Press "Submit" when you are happy with your prediction.

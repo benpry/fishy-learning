@@ -48,9 +48,10 @@ export const nTrialsByCondition = {
 };
 
 export const messageConditionTimes = {
-  0: 5,
-  1: 10,
-  2: 30,
+  0: 3,
+  1: 5,
+  2: 10,
+  3: 30,
 };
 
 export const fishesByCondition = {
