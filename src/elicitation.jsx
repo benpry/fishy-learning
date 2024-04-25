@@ -25,18 +25,12 @@ function argmax(arr) {
 
 function getDirichletBounds(probs, n, nFishes) {
   const bounds = probs.map((p) => {
-    if (p == 0) {
-      return [0, 0];
-    } else if (p == 1) {
-      return [1, 1];
-    } else {
-      const alpha = p * n;
-      const beta = (1 - p) * n;
-      return [
-        jStat.beta.inv(0.25, alpha, beta),
-        jStat.beta.inv(0.75, alpha, beta),
-      ];
-    }
+    const alpha = p * n;
+    const beta = (1 - p) * n;
+    return [
+      jStat.beta.inv(0.25, alpha, beta),
+      jStat.beta.inv(0.75, alpha, beta),
+    ];
   });
   return bounds;
 }
@@ -47,7 +41,7 @@ export default function Elicitation(props) {
   const nFishes = fishNames.length;
 
   const [probs, updateProbs] = useState(Array(nFishes).fill(1 / nFishes));
-  const [conf, updateConf] = useState(nFishes);
+  const [conf, updateConf] = useState(Math.log2(nFishes));
 
   const handleProbChange = (i, val) => {
     let newProbs = [...probs];
@@ -67,7 +61,8 @@ export default function Elicitation(props) {
     margin: "0 1rem",
   };
 
-  const bounds = getDirichletBounds(probs, conf, nFishes);
+  const effectiveN = 2 ** (conf / 10);
+  const bounds = getDirichletBounds(probs, effectiveN, nFishes);
 
   return (
     <div>
@@ -124,8 +119,8 @@ export default function Elicitation(props) {
           key={"conf"}
           className="jspsych-slider conf-slider"
           type="range"
-          min={nFishes}
-          max="50"
+          min={1}
+          max={60}
           value={conf}
           onChange={(e) => {
             const newConf = e.target.value;
@@ -167,10 +162,10 @@ export default function Elicitation(props) {
       </button>
       <div className="elicitationInstructions">
         <p className="instructions-text">
-          Use the sliders above to report a range that you are 50% confident
-          covers the true number of each type of fish. Remember that you will
-          get a bonus if your range covers the true number, and your bonus will
-          be larger the more confident you are in your predictions.
+          Use the sliders above to report a range that you are 50% sure covers
+          the true number of each type of fish. Remember that you will get a
+          bonus if your range covers the true number, and your bonus will be
+          larger the more confident you are in your predictions.
         </p>
         <p className="instructions-text">
           Press "Submit" when you are happy with your prediction.
