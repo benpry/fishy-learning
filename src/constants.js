@@ -41,14 +41,14 @@ export const colors = {
 };
 
 export const nTrialsByCondition = {
-  0: 10,
-  1: 10,
-  2: 10,
-  3: 10,
+  0: 3,
+  1: 3,
+  2: 3,
+  3: 3,
 };
 
 export const messageConditionTimes = {
-  0: 3,
+  0: 2,
   1: 5,
   2: 10,
   3: 30,
@@ -73,7 +73,15 @@ export const fishesByCondition = {
   },
   "-1": {
     fishes: ["blue", "red"],
-    probs: [0.36, 0.74],
+    probs: [0.26, 0.74],
+  },
+  "-2": {
+    fishes: ["cyan", "white"],
+    probs: [0.63, 0.37],
+  },
+  "-3": {
+    fishes: ["purple", "yellow", "dark grey"],
+    probs: [0.21, 0.34, 0.45],
   },
 };
 
@@ -82,10 +90,13 @@ const lakeNames = {
   1: "Lake Onki",
   2: "Lake Pihla",
   3: "Lake Jonu",
+  "-1": "Lake Ori",
+  "-2": "Lake Teli",
+  "-3": "Lake Lumm",
 };
 
 const timeEstimate = 10;
-const basePayment = 1;
+const basePayment = 2;
 const maxBonus = 1;
 
 export const consentText = eval("`" + consentHtml + "`");
@@ -128,7 +139,9 @@ export const getBlockHeaderHTML = (condition) => {
   }. There are ${
     fishNames.length
   } types of fish in the lake. They are:\n${fishNames.join(", ")}.</p>
-${fishImages}`;
+${fishImages}
+<p class="instructions-text">You know there is at least one of each type of fish in the lake.</p>
+`;
 };
 
 export const testPhaseInstructions = eval(

@@ -66,7 +66,7 @@ export default function Elicitation(props) {
 
   return (
     <div>
-      <h1>Report your findings</h1>
+      <h1>Report your beliefs</h1>
       <div className="elicitation-row" style={rowStyle}>
         {range(nFishes).map((i) => (
           <div key={i} style={itemStyle} className="prob-wrapper">

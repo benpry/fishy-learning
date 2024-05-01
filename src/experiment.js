@@ -49,6 +49,7 @@ import { jStat } from "jstat";
 
 const handleChainAssignment = (
   stimulusCondition,
+  receiveMessage,
   messageCondition,
   writeMessage,
   chainHolder,
@@ -79,8 +80,17 @@ const handleChainAssignment = (
   }
 };
 
+const practiceTrialObservations = {
+  "-1": ["red", "blue", "red", "red", "red"],
+  "-2": ["cyan"],
+  "-3": ["purple", "dark grey", "dark grey"],
+};
+
+const practiceStimulusConditions = ["-1", "-2", "-3"];
+
 function getInitialTrials(
   assetPaths,
+  doLearning,
   writeMessage,
   receiveMessage,
   messageCondition,
@@ -127,12 +137,6 @@ function getInitialTrials(
       required: true,
     },
     {
-      prompt: "When you catch a fish, it is permanently removed from the lake",
-      name: "replacement",
-      options: ["true", "false"],
-      required: true,
-    },
-    {
       prompt:
         "The more confident you are in your predictions, the higher your potential bonus will be.",
       name: "confidence",
@@ -141,12 +145,23 @@ function getInitialTrials(
     },
     {
       prompt:
-        "You will still earn an individual bonus if the true numbers of fish fall outside of the range you predict.",
+        "You will still earn a bonus from your predictions if the true numbers of fish fall outside of the range you predict.",
       name: "confidenceRange",
       options: ["true", "false"],
       required: true,
     },
   ];
+
+  if (doLearning == 1) {
+    qs.push({
+      prompt: "When you catch a fish, it is permanently removed from the lake",
+      name: "replacement",
+      options: ["true", "false"],
+      required: true,
+    });
+  }
+
+  shuffle(qs);
 
   const correctAnswers = {
     proportions: "true",
@@ -178,8 +193,8 @@ function getInitialTrials(
         .filter({ task: "comprehension-check" })
         .last(1)
         .values()[0].response;
-      const correct = Object.entries(correctAnswers).every(([key, value]) => {
-        return responses[key] === value;
+      const correct = Object.entries(responses).every(([key, value]) => {
+        return correctAnswers[key] === value;
       });
       return correct ? false : true;
     },
@@ -189,7 +204,7 @@ function getInitialTrials(
     timeline: [
       {
         type: HtmlButtonResponse,
-        stimulus: `<p class="instructions-text">You answered all the questions correctly! Press 'Continue' to move on to the practice round.</p>`,
+        stimulus: `<p class="instructions-text">You answered all the questions correctly! Press 'Continue' to move on to the practice rounds.</p>`,
         choices: ["Continue"],
       },
     ],
@@ -199,8 +214,8 @@ function getInitialTrials(
         .filter({ task: "comprehension-check" })
         .last(1)
         .values()[0].response;
-      const correct = Object.entries(correctAnswers).every(([key, value]) => {
-        return responses[key] === value;
+      const correct = Object.entries(responses).every(([key, value]) => {
+        return correctAnswers[key] === value;
       });
       return correct;
     },
@@ -219,8 +234,8 @@ function getInitialTrials(
         .filter({ task: "comprehension-check" })
         .last(1)
         .values()[0].response;
-      const correct = Object.entries(correctAnswers).every(([key, value]) => {
-        return responses[key] === value;
+      const correct = Object.entries(responses).every(([key, value]) => {
+        return correctAnswers[key] === value;
       });
       return correct ? false : true;
     },
@@ -233,6 +248,7 @@ function getInitialTrials(
 
 function getBlockHeader(
   stimulusCondition,
+  receiveMessage,
   messageCondition,
   writeMessage,
   chainHolder,
@@ -244,6 +260,7 @@ function getBlockHeader(
     on_load: () => {
       handleChainAssignment(
         stimulusCondition,
+        receiveMessage,
         messageCondition,
         writeMessage,
         chainHolder,
@@ -283,8 +300,7 @@ function getReceiveMessageTrial(writeMessage, jsPsych, chainHolder) {
 
 function getLearningTrials(stimulusCondition, jsPsych) {
   const fishes = fishesByCondition[stimulusCondition].fishes;
-  // const nTrials = nTrialsByCondition[stimulusCondition];
-  const nTrials = Math.floor(Math.random() * 9) + 1;
+  const nTrials = nTrialsByCondition[stimulusCondition];
   const fishProbs = fishesByCondition[stimulusCondition].probs;
 
   const timeline = [];
@@ -438,76 +454,79 @@ function getPostExperimentSurvey() {
   return postExperimentSurvey;
 }
 
-function getPracticeRound(
+function getOnePracticeRound(
   doLearning,
   writeMessage,
   receiveMessage,
   messageWritingTime,
+  stimulusCondition,
   jsPsych,
 ) {
-  const practiceTimeline = [];
+  const practiceRoundTimeline = [];
+  shuffle(practiceTrialObservations[stimulusCondition]);
 
-  practiceTimeline.push({
+  practiceRoundTimeline.push({
     type: HtmlButtonResponse,
-    stimulus: `<p class="instructions-text">This is a practice round for you to complete before you begin the main experiment.</p>`,
+    stimulus: getBlockHeaderHTML(stimulusCondition),
     choices: ["Continue"],
   });
 
   if (receiveMessage == 1) {
-    practiceTimeline.push({
+    practiceRoundTimeline.push({
       type: HtmlButtonResponse,
-      stimulus: renderMessage("This is a test message."),
+      stimulus: renderMessage("This is an example message."),
       choices: ["Continue"],
     });
   }
-  if (doLearning == 1) {
-    practiceTimeline.push({
+
+  practiceRoundTimeline.push({
+    type: HtmlButtonResponse,
+    stimulus: `<p>You will now start the learning trials. Press "continue" to begin.</p>`,
+    choices: ["Continue"],
+  });
+
+  const learningStages = [
+    {
       type: HtmlButtonResponse,
-      stimulus: `<p>You will now start the learning trials. Press "continue" to begin.</p>`,
+      stimulus: "Click the fishing rod to catch a fish",
+      choices: ["fish"],
+      data: function () {
+        return {
+          phase: "learning",
+        };
+      },
+      button_html: fishingRodHTML,
+    },
+    {
+      type: HtmlButtonResponse,
+      stimulus: function () {
+        const caughtFish = jsPsych.timelineVariable("fishCaught");
+        return formatCaughtFish(caughtFish);
+      },
+      data: function () {
+        const caughtFish = jsPsych.timelineVariable("fishCaught");
+        return {
+          phase: "learning",
+          fishCaught: caughtFish,
+          stimulusCondition: stimulusCondition,
+        };
+      },
       choices: ["Continue"],
-    });
+    },
+  ];
 
-    const learningStages = [
-      {
-        type: HtmlButtonResponse,
-        stimulus: "Click the fishing rod to catch a fish",
-        choices: ["fish"],
-        data: function () {
-          return {
-            phase: "learning",
-          };
-        },
-        button_html: fishingRodHTML,
-      },
-      {
-        type: HtmlButtonResponse,
-        stimulus: function () {
-          const caughtFish = jsPsych.timelineVariable("fishCaught");
-          return formatCaughtFish(caughtFish);
-        },
-        data: function () {
-          const caughtFish = jsPsych.timelineVariable("fishCaught");
-          return {
-            phase: "learning",
-            fishCaught: caughtFish,
-            stimulusCondition: -1,
-          };
-        },
-        choices: ["Continue"],
-      },
-    ];
-
-    const learningTimeline = {
-      timeline: learningStages,
-      timeline_variables: ["red", "blue", "red", "red", "red"].map((f) => {
+  const learningTimeline = {
+    timeline: learningStages,
+    timeline_variables: practiceTrialObservations[stimulusCondition].map(
+      (f) => {
         return {
           fishCaught: f,
         };
-      }),
-      randomize_order: false,
-    };
-    practiceTimeline.push(learningTimeline);
-  }
+      },
+    ),
+    randomize_order: false,
+  };
+  practiceRoundTimeline.push(learningTimeline);
 
   if (writeMessage == 1) {
     const writeMessageInstructions = {
@@ -519,7 +538,7 @@ function getPracticeRound(
       choices: [],
       trial_duration: 3000,
     };
-    practiceTimeline.push(writeMessageInstructions);
+    practiceRoundTimeline.push(writeMessageInstructions);
 
     const writeMessageTrial = {
       type: HtmlSurveyText,
@@ -536,17 +555,19 @@ function getPracticeRound(
       on_load: () => {
         startTimer(messageWritingTime);
       },
-      data: { phase: "writeMessage", stimulusCondition: -1 },
+      data: { phase: "writeMessage", stimulusCondition: stimulusCondition },
     };
-    practiceTimeline.push(writeMessageTrial);
+    practiceRoundTimeline.push(writeMessageTrial);
   }
 
-  practiceTimeline.push(...getTestTrials(-1));
+  // add dependent measure
+  practiceRoundTimeline.push(...getTestTrials(stimulusCondition));
 
   // feedback
-  practiceTimeline.push({
+  practiceRoundTimeline.push({
     type: HtmlButtonResponse,
     stimulus: () => {
+      // get the probs and conf
       const probs = jsPsych.data
         .get()
         .filter({ phase: "test" })
@@ -557,32 +578,86 @@ function getPracticeRound(
         .filter({ phase: "test" })
         .last(1)
         .values()[0].conf;
-      const beta = probs[0] * conf;
-      const alpha = probs[1] * conf;
-      const rangeMin = jStat.beta.inv(0.25, alpha, beta);
-      const rangeMax = jStat.beta.inv(0.75, alpha, beta);
 
-      let feedbackMessage;
-      if (rangeMin > 0.74 || rangeMax < 0.74) {
-        feedbackMessage = `<p class="instructions-text">There were 74 red fish and 26 blue fish in the lake. If this were a real prediction trial, you would not have earned a bonus.</p>`;
-      } else if (conf < 5) {
-        feedbackMessage = `<p class="instructions-text">There were 74 red fish and 26 blue fish in the lake. If this were a real prediction trial, you would have earned a small bonus.</p>`;
-      } else if (conf < 10) {
-        feedbackMessage = `<p class="instructions-text">There were 74 red fish and 26 blue fish in the lake. If this were a real prediction trial, you would have earned a medium bonus.</p>`;
-      } else {
-        feedbackMessage = `<p class="instructions-text">There were 74 red fish and 26 blue fish in the lake. If this were a real prediction trial, you would have earned a large bonus.</p>`;
-      }
-      feedbackMessage += `<p class="instructions-text">You will not receive feedback after prediction trials in the real trials.</p>`;
+      const trueProbs = fishesByCondition[stimulusCondition].probs;
+      const trueColors = fishesByCondition[stimulusCondition].fishes;
+
+      const trueProbString =
+        "The true numbers of fish were " +
+        trueProbs.map((p, i) => `${p * 100} ${trueColors[i]}`).join(", ");
+
+      const reportedN = 2 ** (conf / 10);
+
+      const isCorrect = trueProbs.every((p, i) => {
+        const alpha = probs[i] * reportedN;
+        const beta = (1 - probs[i]) * reportedN;
+        const rangeMin = jStat.beta.inv(0.25, alpha, beta);
+        const rangeMax = jStat.beta.inv(0.75, alpha, beta);
+
+        return p >= rangeMin && p <= rangeMax;
+      });
+
+      const bonusSize = isCorrect
+        ? reportedN < 5
+          ? "small"
+          : reportedN < 10
+          ? "medium"
+          : "large"
+        : "none";
+
+      const bonusString = isCorrect
+        ? `If this were a real trial, you would have earned a ${bonusSize} bonus.`
+        : "If this were a real trial, you would not have earned a bonus.";
+
+      const feedbackMessage = `<p class="instructions-text">${trueProbString}</p>
+                               <p class="instructions-text">${bonusString}</p>`;
       return feedbackMessage;
     },
     choices: ["Continue"],
   });
 
+  return practiceRoundTimeline;
+}
+
+function getPracticeRounds(
+  doLearning,
+  writeMessage,
+  receiveMessage,
+  messageWritingTime,
+  jsPsych,
+) {
+  const practiceTimeline = [];
+
+  let practiceMessage = `<p class="instructions-text">You will now complete three practice rounds. Press "continue" to begin.</p>`;
+  if (doLearning == 0) {
+    practiceMessage += `<p class="instructions-text">Unlike the main experiment, in the practice rounds you will <strong>catch fish at each lake</strong> before reporting your beliefs.</p>`;
+  }
+
   practiceTimeline.push({
     type: HtmlButtonResponse,
-    stimulus: `<p class="instructions-text">You have completed the practice round! Press 'Continue' to begin the main experiment.</p>`,
+    stimulus: practiceMessage,
     choices: ["Continue"],
-    data: { phase: "practice", stimulusCondition: -1 },
+  });
+
+  shuffle(practiceStimulusConditions);
+
+  for (let stimulusCondition of practiceStimulusConditions) {
+    practiceTimeline.push(
+      ...getOnePracticeRound(
+        doLearning,
+        writeMessage,
+        receiveMessage,
+        messageWritingTime,
+        stimulusCondition,
+        jsPsych,
+      ),
+    );
+  }
+
+  practiceTimeline.push({
+    type: HtmlButtonResponse,
+    stimulus: `<p class="instructions-text">You have completed the practice rounds! Press 'Continue' to begin the main experiment.</p>`,
+    choices: ["Continue"],
   });
 
   return practiceTimeline;
@@ -605,6 +680,7 @@ export async function run({
   const chainHolder = { item: chain };
 
   const jsPsych = initJsPsych({
+    show_progress_bar: true,
     on_finish: function (data) {
       if (!data.last(1).values()[0].failed) {
         proliferate.submit({
@@ -633,6 +709,7 @@ export async function run({
   timeline.push(
     ...getInitialTrials(
       assetPaths,
+      doLearning,
       writeMessage,
       receiveMessage,
       messageCondition,
@@ -643,7 +720,7 @@ export async function run({
   );
 
   timeline.push(
-    ...getPracticeRound(
+    ...getPracticeRounds(
       doLearning,
       writeMessage,
       receiveMessage,
@@ -659,6 +736,7 @@ export async function run({
     blockTimeline.push(
       getBlockHeader(
         stimulusCondition,
+        receiveMessage,
         messageCondition,
         writeMessage,
         chainHolder,

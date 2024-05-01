@@ -182,7 +182,11 @@ class SurveyTextPlugin {
     display_element.innerHTML = html;
     // backup in case autofocus doesn't work
 
+    let trial_ended = false;
     const end_trial = () => {
+      if (trial_ended) {
+        return;
+      }
       // measure response time
       var endTime = performance.now();
       var response_time = Math.round(endTime - startTime);
@@ -208,6 +212,7 @@ class SurveyTextPlugin {
         response: question_data,
       };
       display_element.innerHTML = "";
+      trial_ended = true;
       // next trial
       this.jsPsych.finishTrial(trialdata);
     };

@@ -1,51 +1,84 @@
 <p class="instructions-text">
-  In this experiment, a machine drops coins into buckets with different
-  probabilities. Another participant observed coins landing in different
-  buckets. The experiment consists of two phases:
+  In this experiment, you will play the role of a wildlife researcher who is
+  studying fish populations in different lakes. You will visit four lakes that
+  each have <strong>100 fish</strong> in them. There are different types of fish
+  in each lake. Your goal is to learn about
+  <strong>how many of each type of fish</strong> live in the lakes.
 </p>
 
-<p class="instructions-text">
-<ol>
-  <li>Reading a message from the previous participant</li>
-  <li>Predicting the probability of a coin landing in each bucket</li>
+<p class="instructions-text">The experiment consists of two phases</p>
+
+<ol class="instructions-text">
+  <li>Reading a message from a previous participant</li>
+  <li>Predicting the distribution of fish in the lake</li>
 </ol>
-</p>
-
-<hr/>
 
 <p class="instructions-text">
-  In the first phase of the experiment, you will
-  <strong>read a message</strong> from a previous participant who saw the same
-  buckets. The previous participant was instructed to write a message that helps
-  you learn about the probabilities, but they only had ${messageWritingTime}
+  You will earn a bonus that depends on how accurately you predict the
+  distribution of fish.
+</p>
+
+<hr />
+
+<p class="instructions-text">
+  When you a arrive at a lake, you will read a message from a previous
+  participant in this study. That participant <strong>caught fish</strong> in
+  the lake and released them back afterward to learn about the distribution of
+  fish types.
+</p>
+
+<p class="instructions-text">
+  The previous participant was instructed to write a message that helps you
+  learn about the fish in the lake, but they only had ${messageWritingTime}
   seconds to write the message.
 </p>
 
-<hr/>
+<hr />
 
 <p class="instructions-text">
-  Next, you will be asked to predict how likely a coin is to be in each bucket.
-  Imagine a million coins were dropped into buckets, what percentage of them do
-  you think would fall in each of the buckets?
+  After reading the message, you will report your beliefs. You will be asked to
+  predict how many fish of each color there are in the lake, along with how
+  confident you are in that prediction.
 </p>
 
-<p class="instructions-text">You will make a prediction using this interface:</p>
+<p class="instructions-text">
+  You will make a prediction using an interface that looks like this:
+</p>
 
 <img
   src="../images/elicitation-screenshot.png"
-  alt="Elicitation Screenshot"
+  alt="Screenshot of the prediction interface"
   style="width: 100%; max-width: 600px"
 />
 
 <p class="instructions-text">
-  The interface asks you to report your confidence along with probabilities. You
-  should use the slider to adjust your confidence so that are
-  <strong>95% sure</strong> that the true probability is in the shaded region.
-  You will earn a <strong>bonus</strong> if the true probability is in the
-  shaded region. Your bonus will be larger the smaller the region is.
+  Adjusting the confidence slider will move the black bars. You should adjust
+  them so that they cover a range that you are 50% sure contains the true
+  numbers of fish. You will earn an
+  <strong>individual bonus</strong> if the true numbers of fish fall in the
+  range you specify. Your bonus will be larger the smaller your range is (i.e.
+  the more confident you are in the prediction).
+</p>
+
+<hr />
+
+<img
+  src="../images/elicitation-screenshot-annotated.png"
+  alt="Screenshot of the prediction interface, with annotations"
+  style="width: 100%; max-width: 600px"
+/>
+
+<p class="instructions-text">
+  It is important to set the confidence slider carefully. If you set it too
+  high, you may miss getting a bonus. But if you set it too low, your bonus may
+  be very small. You should think about how much evidence you have for your
+  prediction and how likely it would be for the true numbers of fish to be
+  outside of the range you specify.
 </p>
 
 <p class="instructions-text">
-  Press "Next" when you are ready to see the message that a previous participant
-  left for you.
+  In the example above, the confidence slider is set so that the range is
+  between 30 and 70 for both red and blue fish. This means you would be 50% sure
+  that there are between 30 and 70 red fish and between 30 and 70 blue fish in
+  the lake.
 </p>
