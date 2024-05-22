@@ -25,8 +25,8 @@ function argmax(arr) {
 
 function getDirichletBounds(probs, n, nFishes) {
   const bounds = probs.map((p) => {
-    const alpha = p * n;
-    const beta = (1 - p) * n;
+    const alpha = p * n + 1 / 3;
+    const beta = (1 - p) * n + (nFishes - 1) / 3;
     return [
       jStat.beta.inv(0.25, alpha, beta),
       jStat.beta.inv(0.75, alpha, beta),
@@ -39,9 +39,12 @@ export default function Elicitation(props) {
   const stimulusCondition = props.stimulusCondition;
   const fishNames = fishesByCondition[stimulusCondition].fishes;
   const nFishes = fishNames.length;
+  // the confidence you would have to have for a uniform distribution
+  const minConf = 10 * Math.log2((2 * nFishes) / 3);
+  const maxConf = Math.log2(64) * 10;
 
   const [probs, updateProbs] = useState(Array(nFishes).fill(1 / nFishes));
-  const [conf, updateConf] = useState(Math.log2(nFishes));
+  const [conf, updateConf] = useState(minConf);
 
   const handleProbChange = (i, val) => {
     let newProbs = [...probs];
@@ -119,8 +122,8 @@ export default function Elicitation(props) {
           key={"conf"}
           className="jspsych-slider conf-slider"
           type="range"
-          min={1}
-          max={60}
+          min={minConf}
+          max={maxConf}
           value={conf}
           onChange={(e) => {
             const newConf = e.target.value;

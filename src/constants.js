@@ -45,6 +45,7 @@ export const nTrialsByCondition = {
   1: 3,
   2: 3,
   3: 3,
+  4: 3,
 };
 
 export const messageConditionTimes = {
@@ -64,12 +65,16 @@ export const fishesByCondition = {
     probs: [0.4, 0.6],
   },
   2: {
-    fishes: ["yellow", "light grey", "green"],
-    probs: [0.1, 0.7, 0.2],
+    fishes: ["yellow", "green"],
+    probs: [0.1, 0.9],
   },
   3: {
-    fishes: ["red", "black", "cyan"],
-    probs: [0.35, 0.15, 0.5],
+    fishes: ["black", "cyan"],
+    probs: [0.7, 0.3],
+  },
+  4: {
+    fishes: ["light grey", "red"],
+    probs: [0.5, 0.5],
   },
   "-1": {
     fishes: ["blue", "red"],
@@ -80,8 +85,8 @@ export const fishesByCondition = {
     probs: [0.63, 0.37],
   },
   "-3": {
-    fishes: ["purple", "yellow", "dark grey"],
-    probs: [0.21, 0.34, 0.45],
+    fishes: ["purple", "light grey"],
+    probs: [0.19, 0.81],
   },
 };
 
@@ -90,6 +95,7 @@ const lakeNames = {
   1: "Lake Onki",
   2: "Lake Pihla",
   3: "Lake Jonu",
+  4: "Lake Sava",
   "-1": "Lake Ori",
   "-2": "Lake Teli",
   "-3": "Lake Lumm",
