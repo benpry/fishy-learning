@@ -25,8 +25,8 @@ function argmax(arr) {
 
 function getDirichletBounds(probs, n, nFishes) {
   const bounds = probs.map((p) => {
-    const alpha = p * n + 1 / 3;
-    const beta = (1 - p) * n + (nFishes - 1) / 3;
+    const alpha = p * n + 0.33;
+    const beta = (1 - p) * n + (nFishes - 1) * 0.33;
     return [
       jStat.beta.inv(0.25, alpha, beta),
       jStat.beta.inv(0.75, alpha, beta),
@@ -40,8 +40,8 @@ export default function Elicitation(props) {
   const fishNames = fishesByCondition[stimulusCondition].fishes;
   const nFishes = fishNames.length;
   // the confidence you would have to have for a uniform distribution
-  const minConf = 10 * Math.log2((2 * nFishes) / 3);
-  const maxConf = Math.log2(64) * 10;
+  const minConf = 1;
+  const maxConf = 10;
 
   const [probs, updateProbs] = useState(Array(nFishes).fill(1 / nFishes));
   const [conf, updateConf] = useState(minConf);
@@ -64,8 +64,7 @@ export default function Elicitation(props) {
     margin: "0 1rem",
   };
 
-  const effectiveN = 2 ** (conf / 10);
-  const bounds = getDirichletBounds(probs, effectiveN, nFishes);
+  const bounds = getDirichletBounds(probs, conf, nFishes);
 
   return (
     <div>
@@ -117,7 +116,7 @@ export default function Elicitation(props) {
           width: "500px",
         }}
       >
-        Confidence:
+        Confidence: {conf}
         <input
           key={"conf"}
           className="jspsych-slider conf-slider"
@@ -130,32 +129,6 @@ export default function Elicitation(props) {
             updateConf(newConf);
           }}
         />
-        <div style={{ fontSize: "medium" }}>
-          <div
-            style={{
-              border: "1px solid transparent",
-              display: "inline-block",
-              position: "absolute",
-              left: "calc( 0% - (50% / 2) - 7.5px)",
-              textAlign: "center",
-              width: "50%",
-            }}
-          >
-            Not confident
-          </div>
-          <div
-            style={{
-              border: "1px solid transparent",
-              display: "inline-block",
-              position: "absolute",
-              left: "calc( 100% - (50% / 2) - 7.5px)",
-              textAlign: "center",
-              width: "50%",
-            }}
-          >
-            Highly confident
-          </div>
-        </div>
       </div>
       <button
         className="jspsych-btn"

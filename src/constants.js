@@ -48,45 +48,55 @@ export const nTrialsByCondition = {
   4: 3,
 };
 
-export const messageConditionTimes = {
-  0: 2,
-  1: 5,
-  2: 10,
-  3: 30,
+export const messageConditionLimits = {
+  0: 1,
+  1: 2,
+  2: 3,
+  3: 10,
 };
 
 export const fishesByCondition = {
   0: {
-    fishes: ["white", "purple"],
-    probs: [0.8, 0.2],
+    fishes: ["white", "purple", "dark grey"],
+    probs: [0.5, 0.17, 0.33],
+    observations: ["white", "white", "purple"],
   },
   1: {
-    fishes: ["dark grey", "blue"],
-    probs: [0.4, 0.6],
+    fishes: ["yellow", "cyan", "light grey"],
+    probs: [0.333, 0.333, 0.334],
+    observations: ["yellow", "cyan", "light grey"],
   },
   2: {
-    fishes: ["yellow", "green"],
-    probs: [0.1, 0.9],
+    fishes: ["red", "green", "black"],
+    probs: [0.15, 0.7, 0.15],
+    observations: ["green", "green", "green"],
   },
   3: {
-    fishes: ["black", "cyan"],
-    probs: [0.7, 0.3],
+    fishes: ["black", "cyan", "dark grey"],
+    probs: [0.17, 0.5, 0.33],
+    observations: ["cyan", "cyan", "dark grey"],
   },
   4: {
-    fishes: ["light grey", "red"],
-    probs: [0.5, 0.5],
+    fishes: ["purple", "red", "light grey"],
+    probs: [0.7, 0.15, 0.15],
+    observations: ["purple", "purple", "purple"],
+  },
+  5: {
+    fishes: ["white", "yellow", "green"],
+    probs: [0.333, 0.333, 0.334],
+    observations: ["white", "yellow", "green"],
   },
   "-1": {
-    fishes: ["blue", "red"],
-    probs: [0.26, 0.74],
+    fishes: ["blue", "red", "black"],
+    probs: [0.26, 0.52, 0.22],
   },
   "-2": {
-    fishes: ["cyan", "white"],
-    probs: [0.63, 0.37],
+    fishes: ["cyan", "white", "dark grey"],
+    probs: [0.63, 0.1, 0.27],
   },
   "-3": {
-    fishes: ["purple", "light grey"],
-    probs: [0.19, 0.81],
+    fishes: ["purple", "light grey", "yellow"],
+    probs: [0.19, 0.43, 0.38],
   },
 };
 
@@ -96,6 +106,7 @@ const lakeNames = {
   2: "Lake Pihla",
   3: "Lake Jonu",
   4: "Lake Sava",
+  5: "Lake Nisu",
   "-1": "Lake Ori",
   "-2": "Lake Teli",
   "-3": "Lake Lumm",

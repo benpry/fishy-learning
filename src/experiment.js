@@ -13,14 +13,14 @@ import PreloadPlugin from "@jspsych/plugin-preload";
 import InstructionsPlugin from "@jspsych/plugin-instructions";
 import HtmlButtonResponse from "@jspsych/plugin-html-button-response";
 import SurveyMultiChoice from "@jspsych/plugin-survey-multi-choice";
-import HtmlSurveyText from "./survey-text-timed";
+import HtmlSurveyText from "./survey-text-char-limit";
 import { initJsPsych } from "jspsych";
 import {
   getInstructionPages,
   fishHTML,
   fishingRodHTML,
   formatCaughtFish,
-  messageConditionTimes,
+  messageConditionLimits,
   nTrialsByCondition,
   fishesByCondition,
   consentText,
@@ -53,7 +53,6 @@ const handleChainAssignment = (
   writeMessage,
   chainHolder,
 ) => {
-  // TODO: assign to chain and return message condition
   const conditionStr = `s${stimulusCondition}`;
   if (writeMessage == 1) {
     assignToChain(conditionStr).then((c) => {
@@ -64,8 +63,6 @@ const handleChainAssignment = (
         );
       } else {
         chainHolder.item = c;
-        console.log("Got chain");
-        console.log(c);
         const mC = parseInt(c.condition[c.condition.length - 1]);
         chainHolder.messageCondition = mC;
       }
@@ -79,8 +76,6 @@ const handleChainAssignment = (
         );
       } else {
         chainHolder.item = c;
-        console.log("Got chain");
-        console.log(c);
         const mC = parseInt(c.condition[c.condition.length - 1]);
         chainHolder.messageCondition = mC;
       }
@@ -94,7 +89,7 @@ const practiceConditionNObs = [
   [5, 6],
 ];
 const practiceStimulusConditions = ["-1", "-2", "-3"];
-const practiceMessageConditionTimes = [2, 5, 10];
+const practiceMessageConditionLimits = [1, 2, 3];
 
 function getInitialTrials(
   assetPaths,
@@ -163,7 +158,7 @@ function getInitialTrials(
     });
   }
 
-  shuffle(qs);
+  // shuffle(qs);
 
   const correctAnswers = {
     proportions: "true",
@@ -239,8 +234,7 @@ function getInitialTrials(
       const correct = Object.entries(responses).every(([key, value]) => {
         return correctAnswers[key] === value;
       });
-      return false;
-      // return correct ? false : true;
+      return correct ? false : true;
     },
   };
 
@@ -270,7 +264,12 @@ function getBlockHeader(
   };
 }
 
-function getReceiveMessageTrial(writeMessage, jsPsych, chainHolder) {
+function getReceiveMessageTrial(
+  writeMessage,
+  jsPsych,
+  chainHolder,
+  stimulusCondition,
+) {
   return {
     type: HtmlButtonResponse,
     stimulus: () => {
@@ -287,7 +286,8 @@ function getReceiveMessageTrial(writeMessage, jsPsych, chainHolder) {
         phase: "readMessage",
         chainId: chain._id,
         messageReceived: chain.messages[chain.messages.length - 1],
-        messageWritingTime: messageWritingTimes[chainHolder.messageCondition],
+        characterLimit: messageConditionLimits[chainHolder.messageCondition],
+        stimulusCondition: stimulusCondition,
       };
     },
     choices: ["Continue"],
@@ -303,7 +303,7 @@ function getReceiveMessageTrial(writeMessage, jsPsych, chainHolder) {
 function getLearningTrials(stimulusCondition, jsPsych) {
   const fishes = fishesByCondition[stimulusCondition].fishes;
   const nTrials = nTrialsByCondition[stimulusCondition];
-  const fishProbs = fishesByCondition[stimulusCondition].probs;
+  const observations = fishesByCondition[stimulusCondition].observations;
 
   const timeline = [];
 
@@ -345,9 +345,9 @@ function getLearningTrials(stimulusCondition, jsPsych) {
 
   const learningTimeline = {
     timeline: learningStages,
-    timeline_variables: range(nTrials).map((i) => {
+    timeline_variables: observations.map((f) => {
       return {
-        fishCaught: sampleFish(fishes, fishProbs),
+        fishCaught: f,
       };
     }),
     randomize_order: true,
@@ -359,42 +359,22 @@ function getLearningTrials(stimulusCondition, jsPsych) {
 
 function getWriteMessageTrials(stimulusCondition, chainHolder) {
   const timeline = [];
-  const writeMessageInstructions = {
-    type: HtmlButtonResponse,
-    stimulus: () => {
-      console.log(chainHolder);
-      const messageCondition = chainHolder.messageCondition;
-      const messageWritingTime = messageConditionTimes[messageCondition];
-      return getWriteMessageInstructions(messageWritingTime);
-    },
-    on_load: () => {
-      startPreWritingTimer(3);
-    },
-    choices: [],
-    trial_duration: 3000,
-  };
-  timeline.push(writeMessageInstructions);
 
   const writeMessageTrial = {
     type: HtmlSurveyText,
-    questions: [
-      {
-        prompt: "Please write a message to help the next participant.",
-        placeholder: "Type your message here",
-        name: "message",
-        rows: 8,
-        columns: 60,
-      },
-    ],
-    trial_duration: () => {
+    questions: () => {
       const messageCondition = chainHolder.messageCondition;
-      const messageWritingTime = messageConditionTimes[messageCondition];
-      return messageWritingTime * 1000;
-    },
-    on_load: () => {
-      const messageCondition = chainHolder.messageCondition;
-      const messageWritingTime = messageConditionTimes[messageCondition];
-      startTimer(messageWritingTime);
+      const characterLimit = messageConditionLimits[messageCondition];
+      return [
+        {
+          prompt: `Please write a message to help the next participant. Your character limit is ${characterLimit}.`,
+          placeholder: "Type your message here",
+          name: "message",
+          rows: 8,
+          columns: 60,
+          character_limit: characterLimit,
+        },
+      ];
     },
     on_finish: function (data) {
       const chain = chainHolder.item;
@@ -477,7 +457,7 @@ function getOnePracticeRound(
   receiveMessage,
   stimulusCondition,
   nTrials,
-  messageWritingTime,
+  characterLimit,
   jsPsych,
 ) {
   const fishes = fishesByCondition[stimulusCondition].fishes;
@@ -547,36 +527,22 @@ function getOnePracticeRound(
   practiceRoundTimeline.push(learningTimeline);
 
   if (writeMessage == 1) {
-    const writeMessageInstructions = {
-      type: HtmlButtonResponse,
-      stimulus: getWriteMessageInstructions(messageWritingTime),
-      on_load: () => {
-        startPreWritingTimer(3);
-      },
-      choices: [],
-      trial_duration: 3000,
-    };
-    practiceRoundTimeline.push(writeMessageInstructions);
-
     const writeMessageTrial = {
       type: HtmlSurveyText,
       questions: [
         {
-          prompt: "Please write a message to help the next participant.",
+          prompt: `Please write a message to help the next participant. Your character limit is ${characterLimit}.`,
           placeholder: "Type your message here",
           name: "message",
           rows: 8,
           columns: 60,
+          character_limit: characterLimit,
         },
       ],
-      trial_duration: messageWritingTime * 1000,
-      on_load: () => {
-        startTimer(messageWritingTime);
-      },
       data: {
         phase: "writeMessage",
         stimulusCondition: stimulusCondition,
-        writingTime: messageWritingTime,
+        characterLimit: characterLimit,
       },
     };
     practiceRoundTimeline.push(writeMessageTrial);
@@ -657,13 +623,13 @@ function getPracticeRounds(doLearning, writeMessage, receiveMessage, jsPsych) {
 
   shuffle(practiceStimulusConditions);
   shuffle(practiceConditionNObs);
-  shuffle(practiceMessageConditionTimes);
+  shuffle(practiceMessageConditionLimits);
 
   for (let i = 0; i < practiceStimulusConditions.length; i++) {
     const stimulusCondition = practiceStimulusConditions[i];
     const nObsCategory = practiceConditionNObs[i];
     const nObs = Math.random() < 0.5 ? nObsCategory[0] : nObsCategory[1];
-    const messageWritingTime = practiceMessageConditionTimes[i];
+    const characterLimit = practiceMessageConditionLimits[i];
     practiceTimeline.push(
       ...getOnePracticeRound(
         doLearning,
@@ -671,7 +637,7 @@ function getPracticeRounds(doLearning, writeMessage, receiveMessage, jsPsych) {
         receiveMessage,
         stimulusCondition,
         nObs,
-        messageWritingTime,
+        characterLimit,
         jsPsych,
       ),
     );
@@ -720,7 +686,7 @@ export async function run({
     },
   });
 
-  const stimulusConditions = [0, 1, 2, 3, 4];
+  const stimulusConditions = [0, 1, 2, 3, 4, 5];
   const doLearning = jsPsych.data.getURLVariable("doL");
   const receiveMessage = jsPsych.data.getURLVariable("recM");
   const writeMessage = jsPsych.data.getURLVariable("wM");
@@ -758,7 +724,12 @@ export async function run({
     // add receive message tiral
     if (receiveMessage == 1) {
       blockTimeline.push(
-        getReceiveMessageTrial(writeMessage, jsPsych, chainHolder),
+        getReceiveMessageTrial(
+          writeMessage,
+          jsPsych,
+          chainHolder,
+          stimulusCondition,
+        ),
       );
     }
 
