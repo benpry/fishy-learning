@@ -25,8 +25,10 @@ function argmax(arr) {
 
 function getDirichletBounds(probs, n, nFishes) {
   const bounds = probs.map((p) => {
+    // adding 0.33 gives us a 50% confidence interval around the median
+    // which lets us avoid error bars that don't contain the mean
     const alpha = p * n + 0.33;
-    const beta = (1 - p) * n + (nFishes - 1) * 0.33;
+    const beta = (1 - p) * n + 0.33;
     return [
       jStat.beta.inv(0.25, alpha, beta),
       jStat.beta.inv(0.75, alpha, beta),

@@ -370,8 +370,8 @@ function getWriteMessageTrials(stimulusCondition, chainHolder) {
           prompt: `Please write a message to help the next participant. Your character limit is ${characterLimit}.`,
           placeholder: "Type your message here",
           name: "message",
-          rows: 8,
-          columns: 60,
+          rows: 1,
+          columns: 30,
           character_limit: characterLimit,
         },
       ];
@@ -534,8 +534,8 @@ function getOnePracticeRound(
           prompt: `Please write a message to help the next participant. Your character limit is ${characterLimit}.`,
           placeholder: "Type your message here",
           name: "message",
-          rows: 8,
-          columns: 60,
+          rows: 1,
+          columns: 30,
           character_limit: characterLimit,
         },
       ],
@@ -691,6 +691,8 @@ export async function run({
   const receiveMessage = jsPsych.data.getURLVariable("recM");
   const writeMessage = jsPsych.data.getURLVariable("wM");
   const timeline = [];
+
+  // timeline.push(getTestTrials(0)[1]);
 
   // add the initial trials
   timeline.push(
