@@ -141,16 +141,13 @@ function getInitialTrials(
       options: ["true", "false"],
       required: true,
     },
-  ];
-
-  if (doLearning == 1) {
-    qs.push({
+    {
       prompt: "When you catch a fish, it is permanently removed from the lake",
       name: "replacement",
       options: ["true", "false"],
       required: true,
-    });
-  }
+    }
+  ];
 
   // shuffle(qs);
 
