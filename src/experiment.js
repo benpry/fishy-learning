@@ -35,13 +35,7 @@ import {
   sendMessage,
   updateReads,
 } from "./api";
-import {
-  shuffle,
-  sampleFish,
-  renderMessage,
-  startTimer,
-  startPreWritingTimer,
-} from "./utils";
+import { shuffle, sampleFish, renderMessage } from "./utils";
 import { range } from "./utils";
 import { proliferate } from "./proliferate";
 import ElicitDistributionPlugin from "./elicit-distribution";
@@ -691,8 +685,6 @@ export async function run({
   const receiveMessage = jsPsych.data.getURLVariable("recM");
   const writeMessage = jsPsych.data.getURLVariable("wM");
   const timeline = [];
-
-  // timeline.push(getTestTrials(0)[1]);
 
   // add the initial trials
   timeline.push(

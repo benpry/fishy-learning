@@ -3,7 +3,6 @@ import teacherInstructionsHtml from "../assets/instructions/teacher-instructions
 import learnerInstructionsHtml from "../assets/instructions/learner-instructions.html";
 import individualInstructionsHtml from "../assets/instructions/individual-instructions.html";
 import testPhaseInstructionsHtml from "../assets/instructions/test-phase-instructions.html";
-import writeMessageHtml from "../assets/instructions/write-message-instructions.html";
 
 export const fishingRodHTML = `
 <img src="assets/images/fishing-rod.svg", class="fish">
@@ -164,7 +163,3 @@ ${fishImages}
 export const testPhaseInstructions = eval(
   "`" + testPhaseInstructionsHtml + "`",
 );
-
-export const getWriteMessageInstructions = (messageWritingTime) => {
-  return eval("`" + writeMessageHtml + "`");
-};
