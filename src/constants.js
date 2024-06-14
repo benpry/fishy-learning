@@ -122,7 +122,7 @@ export const getInstructionPages = (
   receiveMessage,
   messageWritingTime,
 ) => {
-  if (writeMessage == 1) {
+  if (writeMessage == 1 && receiveMessage == 0) {
     const instructionsHtml = eval("`" + teacherInstructionsHtml + "`").replace(
       /<hr \/>/g,
       "<hr/>",

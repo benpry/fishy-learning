@@ -141,9 +141,11 @@ export default function Elicitation(props) {
       <div className="elicitationInstructions">
         <p className="instructions-text">
           Use the sliders above to report a range that you are 50% sure covers
-          the true number of each type of fish. Remember that you will get a
-          bonus if your range covers the true number, and your bonus will be
-          larger the more confident you are in your predictions.
+          the true number of each type of fish. You should think of the
+          confidence value as the effective number of observations informing
+          your guess. Remember that you will get a bonus if your range covers
+          the true number, and your bonus will be larger the more confident you
+          are in your predictions.
         </p>
         <p className="instructions-text">
           Press "Submit" when you are happy with your prediction.

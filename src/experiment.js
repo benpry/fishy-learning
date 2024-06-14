@@ -146,7 +146,7 @@ function getInitialTrials(
       name: "replacement",
       options: ["true", "false"],
       required: true,
-    }
+    },
   ];
 
   // shuffle(qs);
@@ -361,7 +361,7 @@ function getWriteMessageTrials(stimulusCondition, chainHolder) {
           prompt: `Please write a message to help the next participant. Your character limit is ${characterLimit}.`,
           placeholder: "Type your message here",
           name: "message",
-          rows: 1,
+          rows: 2,
           columns: 30,
           character_limit: characterLimit,
         },
@@ -375,6 +375,7 @@ function getWriteMessageTrials(stimulusCondition, chainHolder) {
       const chain = chainHolder.item;
       return {
         phase: "writeMessage",
+        characterLimit: messageConditionLimits[chainHolder.messageCondition],
         chainId: chain._id,
         stimulusCondition: stimulusCondition,
       };
@@ -468,6 +469,8 @@ function getOnePracticeRound(
       stimulus: renderMessage("This is an example message."),
       choices: ["Continue"],
     });
+    // add dependent measure
+    practiceRoundTimeline.push(...getTestTrials(stimulusCondition));
   }
 
   practiceRoundTimeline.push({
@@ -525,7 +528,7 @@ function getOnePracticeRound(
           prompt: `Please write a message to help the next participant. Your character limit is ${characterLimit}.`,
           placeholder: "Type your message here",
           name: "message",
-          rows: 1,
+          rows: 2,
           columns: 30,
           character_limit: characterLimit,
         },
@@ -577,9 +580,9 @@ function getOnePracticeRound(
       });
 
       const bonusSize = isCorrect
-        ? reportedN < 5
+        ? reportedN < 3
           ? "small"
-          : reportedN < 10
+          : reportedN < 8
           ? "medium"
           : "large"
         : "none";
@@ -722,6 +725,9 @@ export async function run({
           stimulusCondition,
         ),
       );
+
+      // then add the post-message elicitation
+      blockTimeline.push(...getTestTrials(stimulusCondition));
     }
 
     // add the learning trials
