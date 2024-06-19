@@ -1,12 +1,14 @@
 <p class="instructions-text">
   In this experiment, you will play the role of a wildlife researcher who is
-  studying fish populations in different lakes. You will visit four lakes that
+  studying fish populations in different lakes. You will visit six lakes that
   each have <strong>100 fish</strong> in them. There are different types of fish
   in each lake. Your goal is to learn about
   <strong>how many of each type of fish</strong> live in the lakes.
 </p>
 
-<p class="instructions-text">The experiment consists of three phases</p>
+<p class="instructions-text">
+  At each lake, you will complete the following phases:
+</p>
 
 <ol class="instructions-text">
   <li>Catching and observing fish</li>
@@ -15,16 +17,15 @@
 </ol>
 
 <p class="instructions-text">
-  You will earn a bonus that depends both on how accurately you predict the
-  distribution of fish and how well the participant who receives your message
-  does.
+  You will earn a <strong>bonus</strong> that depends on the accuracy of your
+  predictions and the participant who receives your message does.
 </p>
 
 <hr />
 
 <p class="instructions-text">
-  When you first visit a lake, you will go fishing. You will catch a series of
-  fish. After catching a fish, you
+  When you first arrive at a lake, you will go fishing. You will catch a series
+  of fish. After catching a fish, you
   <strong>release it back into the lake</strong>. In this phase, you should
   click the fishing rod to go fishing. You will then see which type of fish you
   caught.
@@ -64,14 +65,20 @@
 <hr />
 
 <p class="instructions-text">
-  Finally, you will report your findings. You will be asked to predict how many
-  fish of each color there are in the lake, along with how confident you are in
-  that prediction.
+  Finally, you will report your beliefs. You will be asked to report the
+  distribution of fish you think is most likely, along with how confident you
+  are in that prediction.
 </p>
 
 <p class="instructions-text">
-  You will make a prediction using an interface that looks like this:
+  You can think of the confidence value as the
+  <strong>total number of fish</strong> that are informing your decision, both
+  those that you have observed and those you were told about. For example, if
+  you've seen two fish and have no other information, setting the confidence
+  value to 2 will maximize your expected bonus.
 </p>
+
+<p class="instructions-text">The prediction interface looks like this:</p>
 
 <img
   src="../images/elicitation-screenshot.png"
@@ -80,18 +87,13 @@
 />
 
 <p class="instructions-text">
-  You can use the sliders to adjust the colored bars and the black lines. You
-  should adjust the bars so that the black lines cover a range that you are 50%
-  sure contains the true numbers of fish. You can think of the confidence value
-  as the
-  <strong>number of fish observed</strong>. For example, if you've seen two
-  fish, setting the confidence value to two is a reasonable strategy.
+  Equivalently, you can think of adjusting the confidence sliders so that there
+  is a 50% chance the true number of fish falls within the range you specify.
 </p>
 
 <p class="instructions-text">
   You will earn an
   <strong>individual bonus</strong> if the true numbers of fish fall in the
-  range you specify. Your bonus will be larger the smaller your range is (i.e.
-  the more confident you are in your prediction). So it is important to set the
-  confidence slider carefully!
+  range you specify. If you do get a bonus, it will be larger the smaller your
+  range is. So it is important to set the confidence slider carefully!
 </p>

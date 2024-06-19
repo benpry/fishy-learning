@@ -1,8 +1,7 @@
 import React from "react";
-import { range } from "./utils";
+import { range, findHDI } from "./utils";
 import { fishesByCondition, colors } from "./constants";
 import { useState } from "react";
-var { jStat } = require("jstat");
 
 function argmax(arr) {
   // from this stackexchange answer: https://stackoverflow.com/a/11301464
@@ -26,13 +25,11 @@ function argmax(arr) {
 function getDirichletBounds(probs, n, nFishes) {
   const bounds = probs.map((p) => {
     // adding 0.33 gives us a 50% confidence interval around the median
-    // which lets us avoid error bars that don't contain the mean
-    const alpha = p * n + 0.33;
-    const beta = (1 - p) * n + 0.33;
-    return [
-      jStat.beta.inv(0.25, alpha, beta),
-      jStat.beta.inv(0.75, alpha, beta),
-    ];
+    // which lets us avoid error bars that don't contain the point estimate
+    const alpha = p * n + 1;
+    const beta = (1 - p) * n + 1;
+
+    return findHDI(alpha, beta);
   });
   return bounds;
 }
@@ -118,7 +115,7 @@ export default function Elicitation(props) {
           width: "500px",
         }}
       >
-        Confidence: {conf}
+        Confidence: {conf} fish
         <input
           key={"conf"}
           className="jspsych-slider conf-slider"
@@ -139,15 +136,15 @@ export default function Elicitation(props) {
         Submit
       </button>
       <div className="elicitationInstructions">
-        <p className="instructions-text">
+        <p className="instructions-text" style={{ margin: "auto" }}>
           Use the sliders above to report a range that you are 50% sure covers
           the true number of each type of fish. You should think of the
-          confidence value as the effective number of observations informing
-          your guess. Remember that you will get a bonus if your range covers
-          the true number, and your bonus will be larger the more confident you
-          are in your predictions.
+          confidence value as the <strong>number of fish</strong> informing your
+          guess. Remember that you will get a bonus if your range covers the
+          true number, and your bonus will be larger the more confident you are
+          in your predictions.
         </p>
-        <p className="instructions-text">
+        <p className="instructions-text" style={{ margin: "auto" }}>
           Press "Submit" when you are happy with your prediction.
         </p>
       </div>

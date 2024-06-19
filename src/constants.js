@@ -57,7 +57,7 @@ export const messageConditionLimits = {
 export const fishesByCondition = {
   0: {
     fishes: ["white", "purple", "dark grey"],
-    probs: [0.5, 0.17, 0.33],
+    probs: [0.65, 0.3, 0.05],
     observations: ["white", "white", "purple"],
   },
   1: {
@@ -67,17 +67,17 @@ export const fishesByCondition = {
   },
   2: {
     fishes: ["red", "green", "black"],
-    probs: [0.15, 0.7, 0.15],
+    probs: [0.05, 0.9, 0.05],
     observations: ["green", "green", "green"],
   },
   3: {
     fishes: ["black", "cyan", "dark grey"],
-    probs: [0.17, 0.5, 0.33],
+    probs: [0.05, 0.65, 0.3],
     observations: ["cyan", "cyan", "dark grey"],
   },
   4: {
     fishes: ["purple", "red", "light grey"],
-    probs: [0.7, 0.15, 0.15],
+    probs: [0.9, 0.05, 0.05],
     observations: ["purple", "purple", "purple"],
   },
   5: {
@@ -86,11 +86,11 @@ export const fishesByCondition = {
     observations: ["white", "yellow", "green"],
   },
   "-1": {
-    fishes: ["blue", "red", "black"],
+    fishes: ["cyan", "red", "black"],
     probs: [0.26, 0.52, 0.22],
   },
   "-2": {
-    fishes: ["cyan", "white", "dark grey"],
+    fishes: ["blue", "white", "dark grey"],
     probs: [0.63, 0.1, 0.27],
   },
   "-3": {

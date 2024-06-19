@@ -35,7 +35,7 @@ import {
   sendMessage,
   updateReads,
 } from "./api";
-import { shuffle, sampleFish, renderMessage } from "./utils";
+import { shuffle, sampleFish, renderMessage, findHDI } from "./utils";
 import { range } from "./utils";
 import { proliferate } from "./proliferate";
 import ElicitDistributionPlugin from "./elicit-distribution";
@@ -386,7 +386,7 @@ function getWriteMessageTrials(stimulusCondition, chainHolder) {
   return timeline;
 }
 
-function getTestTrials(stimulusCondition) {
+function getTestTrials(stimulusCondition, phaseName) {
   const timeline = [];
 
   timeline.push({
@@ -399,7 +399,7 @@ function getTestTrials(stimulusCondition) {
   timeline.push({
     type: ElicitDistributionPlugin,
     stimulusCondition: stimulusCondition,
-    data: { phase: "test", stimulusCondition: stimulusCondition },
+    data: { phase: phaseName, stimulusCondition: stimulusCondition },
   });
 
   return timeline;
@@ -470,7 +470,9 @@ function getOnePracticeRound(
       choices: ["Continue"],
     });
     // add dependent measure
-    practiceRoundTimeline.push(...getTestTrials(stimulusCondition));
+    practiceRoundTimeline.push(
+      ...getTestTrials(stimulusCondition, "elicitPrior"),
+    );
   }
 
   practiceRoundTimeline.push({
@@ -543,7 +545,9 @@ function getOnePracticeRound(
   }
 
   // add dependent measure
-  practiceRoundTimeline.push(...getTestTrials(stimulusCondition));
+  practiceRoundTimeline.push(
+    ...getTestTrials(stimulusCondition, "elicitPosterior"),
+  );
 
   // feedback
   practiceRoundTimeline.push({
@@ -552,12 +556,12 @@ function getOnePracticeRound(
       // get the probs and conf
       const probs = jsPsych.data
         .get()
-        .filter({ phase: "test" })
+        .filter({ phase: "elicitPosterior" })
         .last(1)
         .values()[0].probs;
       const conf = jsPsych.data
         .get()
-        .filter({ phase: "test" })
+        .filter({ phase: "elicitPosterior" })
         .last(1)
         .values()[0].conf;
 
@@ -568,21 +572,18 @@ function getOnePracticeRound(
         "The true numbers of fish were " +
         trueProbs.map((p, i) => `${p * 100} ${trueColors[i]}`).join(", ");
 
-      const reportedN = 2 ** (conf / 10);
-
       const isCorrect = trueProbs.every((p, i) => {
-        const alpha = probs[i] * reportedN + 1 / 3;
-        const beta = (1 - probs[i]) * reportedN + 1 / 3;
-        const rangeMin = jStat.beta.inv(0.25, alpha, beta);
-        const rangeMax = jStat.beta.inv(0.75, alpha, beta);
+        const alpha = probs[i] * conf + 1;
+        const beta = (1 - probs[i]) * conf + 1;
+        const [rangeMin, rangeMax] = findHDI(alpha, beta, 0.5);
 
         return p >= rangeMin && p <= rangeMax;
       });
 
       const bonusSize = isCorrect
-        ? reportedN < 3
+        ? conf < 3
           ? "small"
-          : reportedN < 8
+          : conf < 8
           ? "medium"
           : "large"
         : "none";
@@ -727,7 +728,7 @@ export async function run({
       );
 
       // then add the post-message elicitation
-      blockTimeline.push(...getTestTrials(stimulusCondition));
+      blockTimeline.push(...getTestTrials(stimulusCondition, "elicitPrior"));
     }
 
     // add the learning trials
@@ -743,7 +744,7 @@ export async function run({
     }
 
     // add the test trials
-    blockTimeline.push(...getTestTrials(stimulusCondition));
+    blockTimeline.push(...getTestTrials(stimulusCondition, "elicitPosterior"));
 
     timeline.push({
       timeline: blockTimeline,

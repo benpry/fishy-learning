@@ -1,3 +1,5 @@
+var { jStat } = require("jstat");
+
 export function range(n) {
   return [...Array(n).keys()];
 }
@@ -46,4 +48,31 @@ export function renderMessage(message) {
    ${renderLines(message)}
    <p class="instructions-text">Press "Continue" when you have finished reading.</p>
 `;
+}
+
+export function findHDI(alpha, beta) {
+  const mode = (alpha - 1) / (alpha + beta - 2);
+  let lower = mode - 0.01;
+  let upper = mode + 0.01;
+
+  while (
+    jStat.beta.cdf(upper, alpha, beta) - jStat.beta.cdf(lower, alpha, beta) <
+    0.5
+  ) {
+    if (
+      jStat.beta.cdf(upper + 0.01, alpha, beta) -
+        jStat.beta.cdf(lower, alpha, beta) >
+      jStat.beta.cdf(upper, alpha, beta) -
+        jStat.beta.cdf(lower - 0.01, alpha, beta)
+    ) {
+      upper += 0.01;
+    } else {
+      lower -= 0.01;
+    }
+  }
+
+  lower = Math.max(0, lower);
+  upper = Math.min(1, upper);
+
+  return [lower, upper];
 }

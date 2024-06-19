@@ -1,33 +1,34 @@
 <p class="instructions-text">
   In this experiment, you will play the role of a wildlife researcher who is
-  studying fish populations in different lakes. You will visit four lakes that
+  studying fish populations in different lakes. You will visit six lakes that
   each have <strong>100 fish</strong> in them. There are different types of fish
   in each lake. Your goal is to learn about
   <strong>how many of each type of fish</strong> live in the lakes.
 </p>
 
-<p class="instructions-text">The experiment consists of five phases</p>
+<p class="instructions-text">
+  At each lake, you will complete the following phases:
+</p>
 
 <ol class="instructions-text">
   <li>Reading a message from a previous participant</li>
-  <li>Catching and observing fish</li>
   <li>Predicting the distribution of fish in the lake</li>
+  <li>Catching and observing fish</li>
   <li>Writing a message for the next participant</li>
   <li>Predicting the distribution of fish in the lake again</li>
 </ol>
 
 <p class="instructions-text">
-  You will earn a bonus that depends on how accurately you predict the
-  distribution of fish.
+  You will earn a <strong>bonus</strong> that depends on the accuracy of your
+  predictions and the participant who receives your message does.
 </p>
 
 <hr />
 
 <p class="instructions-text">
-  When you a arrive at a lake, you will read a message from a previous
-  participant. That participant <strong>caught fish</strong> in
-  the same lake and released them back to learn about the distribution of
-  fish types.
+  When you a first arrive at a lake, you will read a message from a previous
+  participant. That participant <strong>caught fish</strong> in the same lake
+  and released them back to learn about the distribution of fish types.
 </p>
 
 <p class="instructions-text">
@@ -39,14 +40,20 @@
 <hr />
 
 <p class="instructions-text">
-  After reading a message, you will report your beliefs.
-  You will be asked to predict how many fish of each color there are in the lake, along with how
+  After reading a message, you will report your beliefs. You will be asked to
+  report the distribution of fish you think is most likely, along with how
   confident you are in that prediction.
 </p>
 
 <p class="instructions-text">
-  You will make a prediction using an interface that looks like this:
+  You can think of the confidence value as the
+  <strong>total number of fish</strong> that are informing your decision, both
+  those that you have observed and those you were told about. For example, if
+  you've seen two fish and have no other information, setting the confidence
+  value to 2 will maximize your expected bonus.
 </p>
+
+<p class="instructions-text">The prediction interface looks like this:</p>
 
 <img
   src="../images/elicitation-screenshot.png"
@@ -55,25 +62,22 @@
 />
 
 <p class="instructions-text">
-  Adjusting the confidence slider will move the black bars. You should adjust
-  them so that they cover a range that you are 50% sure contains the true
-  numbers of fish. You can think of the confidence value as the
-  <strong>number of fish observed</strong>. For example, if you've seen two
-  fish, setting the confidence value to two is a reasonable strategy.
+  Equivalently, you can think of adjusting the confidence sliders so that there
+  is a 50% chance the true number of fish falls within the range you specify.
 </p>
 
 <p class="instructions-text">
   You will earn an
   <strong>individual bonus</strong> if the true numbers of fish fall in the
-  range you specify. Your bonus will be larger the smaller your range is (i.e.
-  the more confident you are in your prediction). So it is important to set the
-  confidence slider carefully!
+  range you specify. If you do get a bonus, it will be larger the smaller your
+  range is. So it is important to set the confidence slider carefully!
 </p>
 
 <hr />
 
 <p class="instructions-text">
-  Next, you will go fishing. You will catch a number of fish. After catching a fish, you
+  Next, you will go fishing. You will catch a number of fish. After catching a
+  fish, you
   <strong>release it back into the lake</strong>. In this phase, you should
   click the fishing rod to go fishing. You will then see which type of fish you
   caught.
@@ -97,7 +101,6 @@
   participant.
 </p>
 
-
 <p class="instructions-text">
   The next participant will also try to learn the distribution of fish in the
   same lake. However, you will only be able to send
@@ -114,6 +117,7 @@
 <hr />
 
 <p class="instructions-text">
-  Finally, you will report your beliefs about the fish in the lake again, using the same interface.
-  You will also earn a bonus based on how well you predict the true distribution of fish in this stage.
+  Finally, you will report your beliefs about the fish in the lake again, using
+  the same interface. You will also earn a bonus based on how well you predict
+  the true distribution of fish in this stage.
 </p>
