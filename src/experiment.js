@@ -60,6 +60,9 @@ const handleChainAssignment = (
         const mC = parseInt(c.condition[c.condition.length - 1]);
         chainHolder.messageCondition = mC;
       }
+      document.querySelectorAll("button").forEach((e) => {
+        e.disabled = false;
+      });
     });
   } else if (receiveMessage == 1) {
     assignToChainNoBusy(conditionStr).then((c) => {
@@ -73,6 +76,9 @@ const handleChainAssignment = (
         const mC = parseInt(c.condition[c.condition.length - 1]);
         chainHolder.messageCondition = mC;
       }
+      document.querySelectorAll("button").forEach((e) => {
+        e.disabled = false;
+      });
     });
   }
 };
@@ -245,6 +251,9 @@ function getBlockHeader(
     stimulus: getBlockHeaderHTML(stimulusCondition),
     choices: ["Continue"],
     on_load: () => {
+      document.querySelectorAll("button").forEach((e) => {
+        e.disabled = true;
+      });
       handleChainAssignment(
         stimulusCondition,
         receiveMessage,
