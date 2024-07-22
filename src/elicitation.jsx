@@ -22,10 +22,14 @@ function argmax(arr) {
   return maxIndex;
 }
 
-function getDirichletBounds(probs, n, nFishes) {
-  const bounds = probs.map((p) => {
+function getDirichletBounds(counts, n, nFishes) {
+  const bounds = counts.map((c) => {
     // adding 0.33 gives us a 50% confidence interval around the median
     // which lets us avoid error bars that don't contain the point estimate
+    if (c === "") {
+      return [0, 1];
+    }
+    const p = c / 10;
     const alpha = p * n + 1;
     const beta = (1 - p) * n + 1;
 
@@ -40,17 +44,34 @@ export default function Elicitation(props) {
   const nFishes = fishNames.length;
   // the confidence you would have to have for a uniform distribution
   const minConf = 1;
-  const maxConf = 10;
+  const maxConf = 15;
 
-  const [probs, updateProbs] = useState(Array(nFishes).fill(1 / nFishes));
+  const [counts, updateCounts] = useState(Array(nFishes).fill(""));
   const [conf, updateConf] = useState(minConf);
+  const [responseMessage, setResponseMessage] = useState(
+    "Press 'Submit' when you are happy with your prediction.",
+  );
 
-  const handleProbChange = (i, val) => {
-    let newProbs = [...probs];
-    newProbs[i] = val;
-    // normalize probs
-    const sum = newProbs.reduce((a, b) => a + b, 0);
-    updateProbs(newProbs.map((p) => p / sum));
+  const handleSubmit = () => {
+    console.log(
+      "counts: ",
+      counts.reduce((a, b) => a + b, 0),
+    );
+    if (counts.includes("")) {
+      setResponseMessage(
+        "Please enter a number for each fish before submitting.",
+      );
+    } else if (counts.some((c) => c < 1 || c > 10)) {
+      setResponseMessage(
+        "Please enter a number between 1 and 10 for each fish",
+      );
+      return;
+    } else if (counts.reduce((a, b) => a + b, 0) !== 10) {
+      setResponseMessage("Please make sure the total number of fish is 10");
+      return;
+    } else {
+      props.submitFn(counts, conf);
+    }
   };
 
   const rowStyle = {
@@ -63,11 +84,16 @@ export default function Elicitation(props) {
     margin: "0 1rem",
   };
 
-  const bounds = getDirichletBounds(probs, conf, nFishes);
+  const bounds = getDirichletBounds(counts, conf, nFishes);
+  console.log("bounds: ", bounds);
+  console.log("counts: ", counts);
 
   return (
     <div>
       <h1>Report your beliefs</h1>
+      <p className="instructions-text" style={{ margin: "1rem auto" }}>
+        Enter the number of fish of each color you think are in the pond.
+      </p>
       <div className="elicitation-row" style={rowStyle}>
         {range(nFishes).map((i) => (
           <div key={i} style={itemStyle} className="prob-wrapper">
@@ -75,38 +101,49 @@ export default function Elicitation(props) {
               <div
                 className="prob-bar"
                 style={{
-                  height: `${probs[i] * 100}%`,
+                  height: `${counts[i] * 10}%`,
                   backgroundColor: colors[fishNames[i]],
                 }}
               />
-              <div
-                className="conf-int"
-                style={{
-                  bottom: `${bounds[i][0] * 100}%`,
-                  top: `${(1 - bounds[i][1]) * 100}%`,
-                }}
-              />
+              {/* {counts[i] == "" ? null : ( */}
+              {/*   <div */}
+              {/*     className="conf-int" */}
+              {/*     style={{ */}
+              {/*       bottom: `${bounds[i][0] * 100}%`, */}
+              {/*       top: `${(1 - bounds[i][1]) * 100}%`, */}
+              {/*     }} */}
+              {/*   /> */}
+              {/* )} */}
             </div>
             <div>
-              {fishNames[i]}: {(probs[i] * 100).toFixed(0)}
+              {fishNames[i]}
               <br />
-              {(bounds[i][0] * 100).toFixed(0)} to
-              {` ${(bounds[i][1] * 100).toFixed(0)}`}
               <input
-                className="jspsych-slider prob-slider"
                 key={i}
-                type="range"
+                type="number"
+                step="1"
                 min="1"
-                max="99"
-                value={(probs[i] * 100).toFixed(0)}
+                max="10"
+                value={counts[i]}
                 onChange={(e) => {
-                  handleProbChange(i, e.target.value / 100);
+                  e.preventDefault();
+                  const newCounts = counts.slice();
+
+                  let countInt = parseInt(e.target.value);
+                  countInt = countInt > 10 ? 10 : countInt < 1 ? 1 : countInt;
+
+                  newCounts[i] = countInt;
+                  updateCounts(newCounts);
                 }}
               />
             </div>
           </div>
         ))}
       </div>
+      <br />
+      <p>
+        Next, enter the total number of fish you think inform your decision.
+      </p>
       <div
         className="confidenceBlock jspsych-html-slider-response-container"
         style={{
@@ -115,11 +152,11 @@ export default function Elicitation(props) {
           width: "500px",
         }}
       >
-        Confidence: {conf} fish
+        Information:{" "}
         <input
           key={"conf"}
-          className="jspsych-slider conf-slider"
-          type="range"
+          type="number"
+          step="1"
           min={minConf}
           max={maxConf}
           value={conf}
@@ -127,25 +164,15 @@ export default function Elicitation(props) {
             const newConf = e.target.value;
             updateConf(newConf);
           }}
-        />
+        />{" "}
+        catches
       </div>
-      <button
-        className="jspsych-btn"
-        onClick={() => props.submitFn(probs, conf)}
-      >
+      <button className="jspsych-btn" onClick={handleSubmit}>
         Submit
       </button>
-      <div className="elicitationInstructions">
+      <div className="responseMessage">
         <p className="instructions-text" style={{ margin: "auto" }}>
-          Use the sliders above to report a range that you are 50% sure covers
-          the true number of each type of fish. You should think of the
-          confidence value as the <strong>number of fish</strong> informing your
-          guess. Remember that you will get a bonus if your range covers the
-          true number, and your bonus will be larger the more confident you are
-          in your predictions.
-        </p>
-        <p className="instructions-text" style={{ margin: "auto" }}>
-          Press "Submit" when you are happy with your prediction.
+          {responseMessage}
         </p>
       </div>
     </div>

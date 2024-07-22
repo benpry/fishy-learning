@@ -37,6 +37,7 @@ export const colors = {
   white: "#FFFFFF",
   red: "#ee6677",
   black: "#222222",
+  empty: "none",
 };
 
 export const nTrialsByCondition = {
@@ -56,34 +57,24 @@ export const messageConditionLimits = {
 
 export const fishesByCondition = {
   0: {
-    fishes: ["white", "purple", "dark grey"],
-    probs: [0.65, 0.3, 0.05],
-    observations: ["white", "white", "purple"],
+    fishes: ["purple", "dark grey", "yellow", "cyan"],
+    probs: [0.5, 0.2, 0.1, 0.2],
+    observations: ["purple", "purple", "purple", "purple", "dark grey", "cyan"],
   },
   1: {
-    fishes: ["yellow", "cyan", "light grey"],
-    probs: [0.333, 0.333, 0.334],
-    observations: ["yellow", "cyan", "light grey"],
+    fishes: ["red", "black", "cyan", "light grey"],
+    probs: [0.1, 0.5, 0.3, 0.1],
+    observations: ["cyan", "cyan", "black", "black", "black"],
   },
   2: {
-    fishes: ["red", "green", "black"],
-    probs: [0.05, 0.9, 0.05],
-    observations: ["green", "green", "green"],
+    fishes: ["yellow", "light grey", "green", "purple"],
+    probs: [0.4, 0.4, 0.1, 0.1],
+    observations: ["yellow", "yellow", "green", "light grey", "light grey"],
   },
   3: {
-    fishes: ["black", "cyan", "dark grey"],
-    probs: [0.05, 0.65, 0.3],
-    observations: ["cyan", "cyan", "dark grey"],
-  },
-  4: {
-    fishes: ["purple", "red", "light grey"],
-    probs: [0.9, 0.05, 0.05],
-    observations: ["purple", "purple", "purple"],
-  },
-  5: {
-    fishes: ["white", "yellow", "green"],
-    probs: [0.333, 0.333, 0.334],
-    observations: ["white", "yellow", "green"],
+    fishes: ["black", "cyan", "green", "red"],
+    probs: [0.1, 0.2, 0.4, 0.3],
+    observations: ["green", "green", "green", "cyan", "red", "red"],
   },
   "-1": {
     fishes: ["cyan", "red", "black"],
@@ -100,12 +91,12 @@ export const fishesByCondition = {
 };
 
 const lakeNames = {
-  0: "Lake Kuolmo",
-  1: "Lake Onki",
-  2: "Lake Pihla",
-  3: "Lake Jonu",
-  4: "Lake Sava",
-  5: "Lake Nisu",
+  0: "Kuolmo Pond",
+  1: "Onki Pond",
+  2: "Pihla Pond",
+  3: "Jonu Pond",
+  4: "Sava Pond",
+  5: "Nisu Pond",
   "-1": "Lake Ori",
   "-2": "Lake Teli",
   "-3": "Lake Lumm",

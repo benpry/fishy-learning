@@ -39,6 +39,8 @@ import { shuffle, sampleFish, renderMessage, findHDI } from "./utils";
 import { range } from "./utils";
 import { proliferate } from "./proliferate";
 import ElicitDistributionPlugin from "./elicit-distribution";
+import ReadMessagePlugin from "./read-message";
+import SendMessagePlugin from "./send-message";
 import { jStat } from "jstat";
 
 const handleChainAssignment = (
@@ -690,11 +692,16 @@ export async function run({
     },
   });
 
-  const stimulusConditions = [0, 1, 2, 3, 4, 5];
+  const stimulusConditions = [0, 1, 2, 3];
   const doLearning = jsPsych.data.getURLVariable("doL");
   const receiveMessage = jsPsych.data.getURLVariable("recM");
   const writeMessage = jsPsych.data.getURLVariable("wM");
   const timeline = [];
+
+  timeline.push({
+    type: ElicitDistributionPlugin,
+    stimulusCondition: 0,
+  });
 
   // add the initial trials
   timeline.push(
