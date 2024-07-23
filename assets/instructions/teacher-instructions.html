@@ -1,85 +1,79 @@
 <p class="instructions-text">
   In this experiment, you will play the role of a wildlife researcher who is
-  studying fish populations in different lakes. You will visit six lakes that
-  each have <strong>100 fish</strong> in them. There are different types of fish
-  in each lake. Your goal is to learn about
-  <strong>how many of each type of fish</strong> live in the lakes.
+  studying fish populations in different ponds. You will visit four ponds that
+  each have <strong>10 fish</strong> in them. There are different types of fish
+  in each pond. Your goal is to learn about
+  <strong>how many of each type of fish</strong> live in the ponds.
 </p>
 
 <p class="instructions-text">
-  At each lake, you will complete the following phases:
+  At each pond, you will complete the following phases:
 </p>
 
 <ol class="instructions-text">
   <li>Catching and observing fish</li>
-  <li>Writing a message for the next participant</li>
-  <li>Predicting the distribution of fish in the lake</li>
+  <li>Composing a message for the next participant</li>
+  <li>Predicting the distribution of fish in the pond</li>
 </ol>
 
 <p class="instructions-text">
   You will earn a <strong>bonus</strong> that depends on the accuracy of your
-  predictions and the predictions made by the participant who receives your
-  message.
+  predictions and the predictions made by the participants who receive your
+  messages.
 </p>
 
 <hr />
 
 <p class="instructions-text">
-  When you first arrive at a lake, you will go fishing. You will catch a number
-  of fish. After catching a fish, you
-  <strong>release it back into the lake</strong>. In this phase, you should
+  When you first arrive at a pond, you will go fishing. You will catch some fish
+  and observe their colors. After catching a fish, you
+  <strong>release it back into the pond</strong>. In this phase, you should
   click the fishing rod to go fishing. You will then see which type of fish you
   caught.
 </p>
 
 <img src="../images/fishing-rod.svg" , alt="Fishing rod" , style="width: 25%" />
 <br />
+<img src="../images/cyan-fish.svg" , alt="cyan fish" , style="width: 25%" />
 <img src="../images/red-fish.svg" , alt="red fish" , style="width: 25%" />
-<img src="../images/blue-fish.svg" , alt="blue fish" , style="width: 25%" />
+<img src="../images/white-fish.svg" , alt="white fish" , style="width: 25%" />
 
 <p class="instructions-text">
-  You will not be able to see which type of fish you caught after you release
-  them, so make sure you <strong>remember which fish you caught</strong>.
+  You will not be able to see the fish you caught after you release them, so
+  make sure you <strong>remember which fish you caught</strong>.
 </p>
 
 <hr />
 
 <p class="instructions-text">
-  After catching some fish, you will need to leave the lake. Before you leave,
-  you will have the opportunity to <strong>write a message</strong> for a future
-  participant.
+  After catching some fish, you will need to leave the pond. Before you leave,
+  you will have the opportunity to send a message to a future participant. The
+  future participant has the same goal as you: to learn the distribution of fish
+  in the pond.
 </p>
 
 <p class="instructions-text">
-  The next participant will also try to learn the distribution of fish in the
-  same lake. However, you will only be able to write
-  <strong>small number of characters</strong>, which might vary form lake to
-  lake. Different future participants might read different messages, so you
-  can't assume that the same participant will read all of your messages.
+  You will compose a message using an interface that lets you send symbols of
+  the same colors as the fish in that pond. You will only be able to send a
+  <strong>limited number of symbols</strong>, which might vary from pond to
+  pond. Here is an example of the interface you use to send a message:
 </p>
+
+<img src="../images/message-screenshot.png" alt="" style="width: 50%" />
 
 <p class="instructions-text">
   Your bonus will depend on the performance of the participants who read your
-  messages, so make sure to write helpful messages!
+  messages, so make sure to send helpful messages!
 </p>
 
 <hr />
 
 <p class="instructions-text">
-  Finally, you will report your beliefs. You will be asked to report the
-  distribution of fish you think is most likely, along with how confident you
-  are in that prediction.
+  Finally, you will report your beliefs. You will be asked to predict the most
+  likely number of fish of each type in the pond, along with how much
+  information you have for that belief. The prediction interface looks like
+  this:
 </p>
-
-<p class="instructions-text">
-  You can think of the confidence value as the
-  <strong>total number of fish</strong> that are informing your decision, both
-  those that you have observed and those you were told about. For example, if
-  you've seen two fish and have no other information, setting the confidence
-  value to 2 will maximize your expected bonus.
-</p>
-
-<p class="instructions-text">The prediction interface looks like this:</p>
 
 <img
   src="../images/elicitation-screenshot.png"
@@ -88,13 +82,16 @@
 />
 
 <p class="instructions-text">
-  Equivalently, you can think of adjusting the confidence sliders so that there
-  is a 50% chance the true number of fish falls within the range you specify.
+  You will earn an
+  <strong>individual bonus</strong> based on how close your prediction is to the
+  true distribution of fish. Setting the information value higher will increase
+  your bonus if your prediction is close to the true distribution, but decrease
+  it if your prediction is far from the true distribution.
 </p>
 
 <p class="instructions-text">
-  You will earn an
-  <strong>individual bonus</strong> if the true numbers of fish fall in the
-  range you specify. If you do get a bonus, it will be larger the smaller your
-  range is. So it is important to set the confidence slider carefully!
+  You can think of the amount of information as the
+  <strong>total number of catches</strong> that inform your decision. For
+  example, if you've caught four fish and have no other information, entering an
+  information value of 4 will maximize your expected bonus.
 </p>

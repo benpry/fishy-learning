@@ -1,21 +1,21 @@
 <p class="instructions-text">
   In this experiment, you will play the role of a wildlife researcher who is
-  studying fish populations in different lakes. You will visit six lakes that
-  each have <strong>100 fish</strong> in them. There are different types of fish
-  in each lake. Your goal is to learn about
-  <strong>how many of each type of fish</strong> live in the lakes.
+  studying fish populations in different ponds. You will visit four ponds that
+  each have <strong>10 fish</strong> in them. There are different types of fish
+  in each pond. Your goal is to learn about
+  <strong>how many of each type of fish</strong> live in the ponds.
 </p>
 
 <p class="instructions-text">
-  At each lake, you will complete the following phases:
+  At each pond, you will complete the following phases:
 </p>
 
 <ol class="instructions-text">
   <li>Reading a message from a previous participant</li>
-  <li>Predicting the distribution of fish in the lake</li>
+  <li>Predicting the distribution of fish in the pond</li>
   <li>Catching and observing fish</li>
   <li>Writing a message for the next participant</li>
-  <li>Predicting the distribution of fish in the lake again</li>
+  <li>Predicting the distribution of fish in the pond again</li>
 </ol>
 
 <p class="instructions-text">
@@ -27,34 +27,27 @@
 <hr />
 
 <p class="instructions-text">
-  When you a first arrive at a lake, you will read a message from a previous
-  participant. That participant <strong>caught fish</strong> in the same lake
+  When you a first arrive at a pond, you will read a message from a previous
+  participant. That participant <strong>caught fish</strong> in the same pond
   and released them back to learn about the distribution of fish types.
 </p>
 
 <p class="instructions-text">
-  The previous participant was instructed to write a message that helps you
-  learn about the fish in the lake, but they were only able to write a limited
-  number of characters.
+  The previous participant composed a message using symbols that were the same
+  colors as the fish in the pond. For example, if the pond had cyan, red, and
+  white fish in it, the previous participant's interface might look like this:
 </p>
+
+<img src="../images/message-screenshot.png" alt="" style="width: 50%" />
 
 <hr />
 
 <p class="instructions-text">
   After reading a message, you will report your beliefs. You will be asked to
-  report the distribution of fish you think is most likely, along with how
-  confident you are in that prediction.
+  predict the most likely number of fish of each type in the pond, along with
+  how much information you have for that belief. The prediction interface looks
+  like this:
 </p>
-
-<p class="instructions-text">
-  You can think of the confidence value as the
-  <strong>total number of fish</strong> that are informing your decision, both
-  those that you have observed and those you were told about. For example, if
-  you've seen two fish and have no other information, setting the confidence
-  value to 2 will maximize your expected bonus.
-</p>
-
-<p class="instructions-text">The prediction interface looks like this:</p>
 
 <img
   src="../images/elicitation-screenshot.png"
@@ -63,23 +56,34 @@
 />
 
 <p class="instructions-text">
-  Equivalently, you can think of adjusting the confidence sliders so that there
-  is a 50% chance the true number of fish falls within the range you specify.
+  You will earn an
+  <strong>individual bonus</strong> based on how close your prediction is to the
+  true distribution of fish. Setting the information value higher will increase
+  your bonus if your prediction is close to the true distribution, but decrease
+  it if your prediction is far from the true distribution.
 </p>
 
 <p class="instructions-text">
-  You will earn an
-  <strong>individual bonus</strong> if the true numbers of fish fall in the
-  range you specify. If you do get a bonus, it will be larger the smaller your
-  range is. So it is important to set the confidence slider carefully!
+  You can think of the amount of information as the
+  <strong>total number of catches</strong> that inform your decision. For
+  example, if you've seen four fish and have no other information, entering an
+  information value of 4 will maximize your expected bonus.
+</p>
+
+<p class="instructions-text">
+  You can think of the confidence value as the
+  <strong>total number of catches</strong> that are informing your decision,
+  both those that you have observed and those you were told about. For example,
+  if you've seen two fish and have no other information, setting the confidence
+  value to 2 will maximize your expected bonus.
 </p>
 
 <hr />
 
 <p class="instructions-text">
-  Next, you will go fishing. You will catch a number of fish. After catching a
-  fish, you
-  <strong>release it back into the lake</strong>. In this phase, you should
+  Next, you will go fishing. You will catch some fish and observe their colors.
+  After catching a fish, you
+  <strong>release it back into the pond</strong>. In this phase, you should
   click the fishing rod to go fishing. You will then see which type of fish you
   caught.
 </p>
@@ -97,18 +101,19 @@
 <hr />
 
 <p class="instructions-text">
-  After catching some fish, you will need to leave the lake. Before you leave,
+  After catching some fish, you will need to leave the pond. Before you leave,
   you will have the opportunity to <strong>write a message</strong> for a future
   participant.
 </p>
 
 <p class="instructions-text">
-  The next participant will also try to learn the distribution of fish in the
-  same lake. However, you will only be able to send
-  <strong>small number of characters</strong>, which might vary from lake to
-  lake. Different future participants might read different messages, so you
-  can't assume that the same participant will read all of your messages.
+  You will compose a message using an interface that lets you send symbols of
+  the same colors as the fish in that pond. You will only be able to send a
+  limited number of symbols, which might vary from pond to pond. Here is an
+  example of the interface you use to create a message:
 </p>
+
+<img src="../images/message-screenshot.png" alt="" style="width: 50%" />
 
 <p class="instructions-text">
   Your bonus will depend on the performance of the participants who read your
@@ -118,7 +123,7 @@
 <hr />
 
 <p class="instructions-text">
-  Finally, you will report your beliefs about the fish in the lake again, using
-  the same interface. You will also earn a bonus based on how well you predict
+  Finally, you will report your beliefs about the fish in the pond again, using
+  the same interface. Your individual bonus also depends on how well you predict
   the true distribution of fish in this stage.
 </p>

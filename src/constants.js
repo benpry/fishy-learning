@@ -62,9 +62,9 @@ export const fishesByCondition = {
     observations: ["purple", "purple", "purple", "purple", "dark grey", "cyan"],
   },
   1: {
-    fishes: ["red", "black", "cyan", "light grey"],
+    fishes: ["red", "white", "cyan", "light grey"],
     probs: [0.1, 0.5, 0.3, 0.1],
-    observations: ["cyan", "cyan", "black", "black", "black"],
+    observations: ["cyan", "cyan", "white", "white", "white"],
   },
   2: {
     fishes: ["yellow", "light grey", "green", "purple"],
@@ -72,34 +72,34 @@ export const fishesByCondition = {
     observations: ["yellow", "yellow", "green", "light grey", "light grey"],
   },
   3: {
-    fishes: ["black", "cyan", "green", "red"],
+    fishes: ["white", "cyan", "green", "red"],
     probs: [0.1, 0.2, 0.4, 0.3],
     observations: ["green", "green", "green", "cyan", "red", "red"],
   },
   "-1": {
-    fishes: ["cyan", "red", "black"],
-    probs: [0.26, 0.52, 0.22],
+    fishes: ["cyan", "red", "white"],
+    probs: [0.3, 0.5, 0.2],
   },
   "-2": {
     fishes: ["blue", "white", "dark grey"],
-    probs: [0.63, 0.1, 0.27],
+    probs: [0.6, 0.1, 0.3],
   },
   "-3": {
     fishes: ["purple", "light grey", "yellow"],
-    probs: [0.19, 0.43, 0.38],
+    probs: [0.2, 0.4, 0.4],
   },
 };
 
-const lakeNames = {
+const pondNames = {
   0: "Kuolmo Pond",
   1: "Onki Pond",
   2: "Pihla Pond",
   3: "Jonu Pond",
   4: "Sava Pond",
   5: "Nisu Pond",
-  "-1": "Lake Ori",
-  "-2": "Lake Teli",
-  "-3": "Lake Lumm",
+  "-1": "Ori Pond",
+  "-2": "Teli Pond",
+  "-3": "Lumm Pond",
 };
 
 const timeEstimate = 10;
@@ -140,14 +140,14 @@ export const getBlockHeaderHTML = (condition) => {
   const fishImages = fishNames
     .map((fish) => fishHTML.replace("%choice%", fish.replace(" ", "-")))
     .join("\n");
-  return `<h1>${lakeNames[condition]}</h1>
+  return `<h1>${pondNames[condition]}</h1>
 <p class="instructions-text">You are now visiting ${
-    lakeNames[condition]
-  }. There are ${
-    fishNames.length
-  } types of fish in the lake. They are:\n${fishNames.join(", ")}.</p>
+    pondNames[condition]
+  }. There are ${fishNames.length} types of fish in the pond: ${fishNames
+    .slice(0, fishNames.length - 1)
+    .join(", ")}, and ${fishNames[fishNames.length - 1]}.</p>
 ${fishImages}
-<p class="instructions-text">You know there is at least one of each type of fish in the lake.</p>
+<p class="instructions-text">You know there is at least one of each type of fish in the pond.</p>
 `;
 };
 

@@ -47,27 +47,21 @@ export default function Elicitation(props) {
   const maxConf = 15;
 
   const [counts, updateCounts] = useState(Array(nFishes).fill(""));
-  const [conf, updateConf] = useState(minConf);
+  const [conf, updateConf] = useState("");
   const [responseMessage, setResponseMessage] = useState(
     "Press 'Submit' when you are happy with your prediction.",
   );
 
   const handleSubmit = () => {
-    console.log(
-      "counts: ",
-      counts.reduce((a, b) => a + b, 0),
-    );
-    if (counts.includes("")) {
-      setResponseMessage(
-        "Please enter a number for each fish before submitting.",
-      );
+    if (counts.includes("") || conf === "") {
+      setResponseMessage("Please fill in all of the values before submitting.");
     } else if (counts.some((c) => c < 1 || c > 10)) {
       setResponseMessage(
         "Please enter a number between 1 and 10 for each fish",
       );
       return;
     } else if (counts.reduce((a, b) => a + b, 0) !== 10) {
-      setResponseMessage("Please make sure the total number of fish is 10");
+      setResponseMessage("Please make sure the numbers of fish add up to 10");
       return;
     } else {
       props.submitFn(counts, conf);
@@ -85,8 +79,6 @@ export default function Elicitation(props) {
   };
 
   const bounds = getDirichletBounds(counts, conf, nFishes);
-  console.log("bounds: ", bounds);
-  console.log("counts: ", counts);
 
   return (
     <div>
@@ -105,15 +97,6 @@ export default function Elicitation(props) {
                   backgroundColor: colors[fishNames[i]],
                 }}
               />
-              {/* {counts[i] == "" ? null : ( */}
-              {/*   <div */}
-              {/*     className="conf-int" */}
-              {/*     style={{ */}
-              {/*       bottom: `${bounds[i][0] * 100}%`, */}
-              {/*       top: `${(1 - bounds[i][1]) * 100}%`, */}
-              {/*     }} */}
-              {/*   /> */}
-              {/* )} */}
             </div>
             <div>
               {fishNames[i]}
@@ -142,7 +125,8 @@ export default function Elicitation(props) {
       </div>
       <br />
       <p>
-        Next, enter the total number of fish you think inform your decision.
+        Next, enter the total number of catches you think inform your decision
+        (between 1 and 15).
       </p>
       <div
         className="confidenceBlock jspsych-html-slider-response-container"
@@ -161,7 +145,13 @@ export default function Elicitation(props) {
           max={maxConf}
           value={conf}
           onChange={(e) => {
-            const newConf = e.target.value;
+            e.preventDefault();
+            let newConf = e.target.value;
+            if (newConf < minConf) {
+              newConf = minConf;
+            } else if (newConf > maxConf) {
+              newConf = maxConf;
+            }
             updateConf(newConf);
           }}
         />{" "}

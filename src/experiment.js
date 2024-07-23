@@ -124,7 +124,7 @@ function getInitialTrials(
 
   const qs = [
     {
-      prompt: "All of the lakes have different proportions of fish",
+      prompt: "All of the ponds have different proportions of fish",
       name: "proportions",
       options: ["true", "false"],
       required: true,
@@ -137,20 +137,20 @@ function getInitialTrials(
     },
     {
       prompt:
-        "The more confident you are in your predictions, the higher your potential bonus will be.",
+        "The higher you set the information value, the higher your potential bonus will be.",
       name: "confidence",
       options: ["true", "false"],
       required: true,
     },
     {
       prompt:
-        "You will still earn a bonus from your predictions if the true numbers of fish fall outside of the range you predict.",
-      name: "confidenceRange",
+        "Your bonus depends on how well the participants who receive your messages do on the task.",
+      name: "message",
       options: ["true", "false"],
       required: true,
     },
     {
-      prompt: "When you catch a fish, it is permanently removed from the lake",
+      prompt: "When you catch a fish, it is permanently removed from the pond",
       name: "replacement",
       options: ["true", "false"],
       required: true,
@@ -164,7 +164,7 @@ function getInitialTrials(
     goal: "false",
     replacement: "false",
     confidence: "true",
-    confidenceRange: "false",
+    message: "true",
   };
 
   const comprehensionCheck = {
@@ -273,8 +273,8 @@ function getReceiveMessageTrial(
   stimulusCondition,
 ) {
   return {
-    type: HtmlButtonResponse,
-    stimulus: () => {
+    type: ReadMessagePlugin,
+    message: () => {
       const chain = chainHolder.item;
       return chain == null
         ? "Loading...."
@@ -282,6 +282,7 @@ function getReceiveMessageTrial(
         ? "You are the first participant in your chain, so there is not a message for you to read."
         : renderMessage(chain.messages[chain.messages.length - 1]);
     },
+    prompt: "The previous participant left the following message for you:",
     data: () => {
       const chain = chainHolder.item;
       return {
@@ -363,24 +364,24 @@ function getWriteMessageTrials(stimulusCondition, chainHolder) {
   const timeline = [];
 
   const writeMessageTrial = {
-    type: HtmlSurveyText,
-    questions: () => {
+    type: SendMessagePlugin,
+    choices: fishesByCondition[stimulusCondition].fishes,
+    length: () => {
+      const chain = chainHolder.item;
+      return messageConditionLimits[chainHolder.messageCondition];
+    },
+    prompt: () => {
       const messageCondition = chainHolder.messageCondition;
       const characterLimit = messageConditionLimits[messageCondition];
-      return [
-        {
-          prompt: `Please write a message to help the next participant. Your character limit is ${characterLimit}.`,
-          placeholder: "Type your message here",
-          name: "message",
-          rows: 2,
-          columns: 30,
-          character_limit: characterLimit,
-        },
-      ];
+      let ret = `Please write a message to help the next participant. You can send ${characterLimit} symbol`;
+      if (characterLimit > 1) {
+        ret += "s";
+      }
+      return ret + ".";
     },
     on_finish: function (data) {
       const chain = chainHolder.item;
-      sendMessage(chain._id, data.response.message);
+      sendMessage(chain._id, data.message);
     },
     data: () => {
       const chain = chainHolder.item;
@@ -535,17 +536,13 @@ function getOnePracticeRound(
 
   if (writeMessage == 1) {
     const writeMessageTrial = {
-      type: HtmlSurveyText,
-      questions: [
-        {
-          prompt: `Please write a message to help the next participant. Your character limit is ${characterLimit}.`,
-          placeholder: "Type your message here",
-          name: "message",
-          rows: 2,
-          columns: 30,
-          character_limit: characterLimit,
-        },
-      ],
+      type: SendMessagePlugin,
+      choices: fishesByCondition[stimulusCondition].fishes,
+      length: characterLimit,
+      prompt:
+        characterLimit == 1
+          ? `Please write a message to help the next participant. You can send ${characterLimit} symbol.`
+          : `Please write a message to help the next participant. You can send ${characterLimit} symbols.`,
       data: {
         phase: "writeMessage",
         stimulusCondition: stimulusCondition,
@@ -565,7 +562,7 @@ function getOnePracticeRound(
     type: HtmlButtonResponse,
     stimulus: () => {
       // get the probs and conf
-      const probs = jsPsych.data
+      const counts = jsPsych.data
         .get()
         .filter({ phase: "elicitPosterior" })
         .last(1)
@@ -580,31 +577,33 @@ function getOnePracticeRound(
       const trueColors = fishesByCondition[stimulusCondition].fishes;
 
       const trueProbString =
-        "The true numbers of fish were " +
-        trueProbs.map((p, i) => `${p * 100} ${trueColors[i]}`).join(", ");
+        "There were " +
+        trueProbs
+          .slice(0, trueProbs.length - 1)
+          .map((p, i) => `${p * 10} ${trueColors[i]},`)
+          .join(" ") +
+        " and " +
+        `${trueProbs[trueProbs.length - 1] * 10} ${
+          trueColors[trueColors.length - 1]
+        }` +
+        " fish in the pond.";
 
       const isCorrect = trueProbs.every((p, i) => {
-        const alpha = probs[i] * conf + 1;
-        const beta = (1 - probs[i]) * conf + 1;
-        const [rangeMin, rangeMax] = findHDI(alpha, beta, 0.5);
-
-        return p >= rangeMin && p <= rangeMax;
+        return Math.abs(p - counts[i] / 10) < 0.1;
       });
 
-      const bonusSize = isCorrect
-        ? conf < 3
-          ? "small"
-          : conf < 8
-          ? "medium"
-          : "large"
-        : "none";
+      const isClose = trueProbs.every((p, i) => {
+        return Math.abs(p - counts[i] / 10) < 0.3;
+      });
 
-      const bonusString = isCorrect
-        ? `If this were a real trial, you would have earned a ${bonusSize} bonus.`
-        : "If this were a real trial, you would not have earned a bonus.";
+      const correctString = isCorrect
+        ? "<p class='instructions-text'>Your prediction was correct!</p>"
+        : isClose
+        ? "<p class='instructions-text'>Your prediction was close!</p>"
+        : "<p class='instructions-text'>Your prediction was far from the true numbers.</p>";
 
       const feedbackMessage = `<p class="instructions-text">${trueProbString}</p>
-                               <p class="instructions-text">${bonusString}</p>`;
+                               <p>${correctString}</p>`;
       return feedbackMessage;
     },
     choices: ["Continue"],
@@ -618,7 +617,7 @@ function getPracticeRounds(doLearning, writeMessage, receiveMessage, jsPsych) {
 
   let practiceMessage = `<p class="instructions-text">You will now complete three practice rounds. Press "continue" to begin.</p>`;
   if (doLearning == 0) {
-    practiceMessage += `<p class="instructions-text">Unlike the main experiment, in the practice rounds you will <strong>catch fish at each lake</strong> before reporting your beliefs.</p>`;
+    practiceMessage += `<p class="instructions-text">Unlike the main experiment, in the practice rounds you will <strong>catch fish at each pond</strong> before reporting your beliefs.</p>`;
   }
 
   practiceTimeline.push({
@@ -697,11 +696,6 @@ export async function run({
   const receiveMessage = jsPsych.data.getURLVariable("recM");
   const writeMessage = jsPsych.data.getURLVariable("wM");
   const timeline = [];
-
-  timeline.push({
-    type: ElicitDistributionPlugin,
-    stimulusCondition: 0,
-  });
 
   // add the initial trials
   timeline.push(
