@@ -435,6 +435,12 @@ function getPostExperimentSurvey() {
         name: "information",
       },
       {
+        prompt: "How did you decide how to send a message?",
+        rows: 6,
+        columns: 50,
+        name: "message",
+      },
+      {
         prompt: "Were any of the instructions unclear?",
         rows: 6,
         columns: 50,
@@ -707,20 +713,20 @@ export async function run({
   const timeline = [];
 
   // add the initial trials
-  // timeline.push(
-  //   ...getInitialTrials(
-  //     assetPaths,
-  //     doLearning,
-  //     writeMessage,
-  //     receiveMessage,
-  //     chainHolder,
-  //     jsPsych,
-  //   ),
-  // );
+  timeline.push(
+    ...getInitialTrials(
+      assetPaths,
+      doLearning,
+      writeMessage,
+      receiveMessage,
+      chainHolder,
+      jsPsych,
+    ),
+  );
 
-  // timeline.push(
-  //   ...getPracticeRounds(doLearning, writeMessage, receiveMessage, jsPsych),
-  // );
+  timeline.push(
+    ...getPracticeRounds(doLearning, writeMessage, receiveMessage, jsPsych),
+  );
 
   shuffle(stimulusConditions);
   for (let stimulusCondition of stimulusConditions) {
