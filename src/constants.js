@@ -50,8 +50,8 @@ export const nTrialsByCondition = {
 
 export const messageConditionLimits = {
   0: 1,
-  1: 2,
-  2: 3,
+  1: 3,
+  2: 5,
   3: 10,
 };
 
@@ -95,8 +95,6 @@ const pondNames = {
   1: "Onki Pond",
   2: "Pihla Pond",
   3: "Jonu Pond",
-  4: "Sava Pond",
-  5: "Nisu Pond",
   "-1": "Ori Pond",
   "-2": "Teli Pond",
   "-3": "Lumm Pond",

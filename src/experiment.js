@@ -86,12 +86,12 @@ const handleChainAssignment = (
 };
 
 const practiceConditionNObs = [
-  [1, 2],
   [3, 4],
   [5, 6],
+  [7, 8],
 ];
 const practiceStimulusConditions = ["-1", "-2", "-3"];
-const practiceMessageConditionLimits = [1, 2, 3];
+const practiceMessageConditionLimits = [1, 3, 5];
 
 function getInitialTrials(
   assetPaths,
@@ -276,11 +276,9 @@ function getReceiveMessageTrial(
     type: ReadMessagePlugin,
     message: () => {
       const chain = chainHolder.item;
-      return chain == null
-        ? "Loading...."
-        : chain.messages.length == 0
-        ? "You are the first participant in your chain, so there is not a message for you to read."
-        : renderMessage(chain.messages[chain.messages.length - 1]);
+      return chain == null || chain.messages.length == 0
+        ? []
+        : chain.messages[chain.messages.length - 1];
     },
     prompt: "The previous participant left the following message for you:",
     data: () => {
@@ -431,10 +429,10 @@ function getPostExperimentSurvey() {
         name: "strategy",
       },
       {
-        prompt: "How did you decide how to set the confidence slider?",
+        prompt: "How did you decide how to set the information value?",
         rows: 6,
         columns: 50,
-        name: "confidence",
+        name: "information",
       },
       {
         prompt: "Were any of the instructions unclear?",
@@ -476,10 +474,21 @@ function getOnePracticeRound(
   });
 
   if (receiveMessage == 1) {
+    const exampleMessage = range(characterLimit).map(() =>
+      sampleFish(fishes, fishProbs),
+    );
     practiceRoundTimeline.push({
-      type: HtmlButtonResponse,
-      stimulus: renderMessage("This is an example message."),
+      type: ReadMessagePlugin,
+      message: exampleMessage,
+      prompt: "Here is an example message:",
       choices: ["Continue"],
+      data: {
+        phase: "readMessage",
+        chainId: "practiceChainId",
+        messageReceived: exampleMessage,
+        characterLimit: characterLimit,
+        stimulusCondition: stimulusCondition,
+      },
     });
     // add dependent measure
     practiceRoundTimeline.push(
@@ -698,20 +707,20 @@ export async function run({
   const timeline = [];
 
   // add the initial trials
-  timeline.push(
-    ...getInitialTrials(
-      assetPaths,
-      doLearning,
-      writeMessage,
-      receiveMessage,
-      chainHolder,
-      jsPsych,
-    ),
-  );
+  // timeline.push(
+  //   ...getInitialTrials(
+  //     assetPaths,
+  //     doLearning,
+  //     writeMessage,
+  //     receiveMessage,
+  //     chainHolder,
+  //     jsPsych,
+  //   ),
+  // );
 
-  timeline.push(
-    ...getPracticeRounds(doLearning, writeMessage, receiveMessage, jsPsych),
-  );
+  // timeline.push(
+  //   ...getPracticeRounds(doLearning, writeMessage, receiveMessage, jsPsych),
+  // );
 
   shuffle(stimulusConditions);
   for (let stimulusCondition of stimulusConditions) {
@@ -764,5 +773,5 @@ export async function run({
 
   timeline.push(getPostExperimentSurvey());
 
-  await jsPsych.run(timeline);
+  timeline = await jsPsych.run(timeline);
 }
