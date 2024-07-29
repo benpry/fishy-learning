@@ -52,6 +52,7 @@ class SendMessagePlugin implements JsPsychPlugin<Info> {
     html += "</div></div>";
 
     const currMessage = [];
+    let gaveWarning = false;
 
     const renderMessage = () => {
       let messageHTML = "";
@@ -98,13 +99,18 @@ class SendMessagePlugin implements JsPsychPlugin<Info> {
     };
 
     // function to handle responses by the subject
-    function after_response(probs, conf) {
+    function after_response() {
       // measure rt
+      if (currMessage.length < trial.length && !gaveWarning) {
+        alert(
+          "The message you entered does not use all the allowed symbols. Please double-check that this is the message you want to send before submitting.",
+        );
+        gaveWarning = true;
+        return;
+      }
+
       var end_time = performance.now();
       var rt = Math.round(end_time - start_time);
-      response.probs = probs;
-      response.conf = conf;
-      response.rt = rt;
 
       end_trial();
     }

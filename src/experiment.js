@@ -712,6 +712,18 @@ export async function run({
   const writeMessage = jsPsych.data.getURLVariable("wM");
   const timeline = [];
 
+  timeline.push({
+    type: SendMessagePlugin,
+    choices: fishesByCondition[0].fishes,
+    length: 5,
+    prompt: `Please write a message to help the next participant. You can send 5 symbols.`,
+    data: {
+      phase: "writeMessage",
+      stimulusCondition: 0,
+      characterLimit: 5,
+    },
+  });
+
   // add the initial trials
   timeline.push(
     ...getInitialTrials(
