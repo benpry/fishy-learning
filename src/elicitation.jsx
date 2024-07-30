@@ -29,7 +29,7 @@ function getDirichletBounds(counts, n, nFishes) {
     if (c === "") {
       return [0, 1];
     }
-    const p = c / 10;
+    const p = c / 20;
     const alpha = p * n + 1;
     const beta = (1 - p) * n + 1;
 
@@ -55,13 +55,13 @@ export default function Elicitation(props) {
   const handleSubmit = () => {
     if (counts.includes("") || conf === "") {
       setResponseMessage("Please fill in all of the values before submitting.");
-    } else if (counts.some((c) => c < 1 || c > 10)) {
+    } else if (counts.some((c) => c < 1 || c > 20)) {
       setResponseMessage(
-        "Please enter a number between 1 and 10 for each fish",
+        "Please enter a number between 1 and 20 for each fish",
       );
       return;
-    } else if (counts.reduce((a, b) => a + b, 0) !== 10) {
-      setResponseMessage("Please make sure the numbers of fish add up to 10");
+    } else if (counts.reduce((a, b) => a + b, 0) !== 20) {
+      setResponseMessage("Please make sure the numbers of fish add up to 20");
       return;
     } else {
       props.submitFn(counts, conf);
@@ -93,7 +93,7 @@ export default function Elicitation(props) {
               <div
                 className="prob-bar"
                 style={{
-                  height: `${counts[i] * 10}%`,
+                  height: `${counts[i] * 5}%`,
                   backgroundColor: colors[fishNames[i]],
                 }}
               />
@@ -106,14 +106,14 @@ export default function Elicitation(props) {
                 type="number"
                 step="1"
                 min="1"
-                max="10"
+                max="20"
                 value={counts[i]}
                 onChange={(e) => {
                   e.preventDefault();
                   const newCounts = counts.slice();
 
                   let countInt = parseInt(e.target.value);
-                  countInt = countInt > 10 ? 10 : countInt < 1 ? 1 : countInt;
+                  countInt = countInt > 20 ? 20 : countInt < 1 ? 1 : countInt;
 
                   newCounts[i] = countInt;
                   updateCounts(newCounts);

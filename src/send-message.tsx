@@ -103,7 +103,7 @@ class SendMessagePlugin implements JsPsychPlugin<Info> {
       // measure rt
       if (currMessage.length < trial.length && !gaveWarning) {
         alert(
-          "The message you entered does not use all the allowed symbols. Please double-check that this is the message you want to send before submitting.",
+          "The message you entered does not use all the allowed symbols. You can still send this message, but please double-check that this is the message you want to send before submitting.",
         );
         gaveWarning = true;
         return;

@@ -27,25 +27,14 @@ export const formatCaughtFish = (fishColor) => {
 };
 
 export const colors = {
-  cyan: "#66ccee",
-  "light grey": "#bbbbbb",
-  "dark grey": "#666666",
-  blue: "#4477aa",
-  yellow: "#ccbb44",
-  purple: "#aa3377",
+  blue: "#4477AA",
+  red: "#EE6677",
   green: "#228833",
+  yellow: "#CCBB44",
+  cyan: "#66CCEE",
+  purple: "#AA3377",
   white: "#FFFFFF",
-  red: "#ee6677",
-  black: "#222222",
-  empty: "none",
-};
-
-export const nTrialsByCondition = {
-  0: 3,
-  1: 3,
-  2: 3,
-  3: 3,
-  4: 3,
+  grey: "#888888",
 };
 
 export const messageConditionLimits = {
@@ -57,23 +46,23 @@ export const messageConditionLimits = {
 
 export const fishesByCondition = {
   0: {
-    fishes: ["purple", "dark grey", "yellow", "cyan"],
-    probs: [0.5, 0.2, 0.1, 0.2],
-    observations: ["purple", "purple", "purple", "purple", "dark grey", "cyan"],
+    fishes: ["purple", "red", "grey", "yellow", "cyan"],
+    probs: [0.5, 0.05, 0.2, 0.05, 0.2],
+    observations: ["purple", "purple", "purple", "purple", "grey", "cyan"],
   },
   1: {
-    fishes: ["red", "white", "cyan", "light grey"],
-    probs: [0.1, 0.5, 0.3, 0.1],
+    fishes: ["red", "white", "cyan", "blue", "green"],
+    probs: [0.05, 0.55, 0.3, 0.05, 0.05],
     observations: ["cyan", "cyan", "white", "white", "white"],
   },
   2: {
-    fishes: ["yellow", "light grey", "green", "purple"],
-    probs: [0.4, 0.4, 0.1, 0.1],
-    observations: ["yellow", "yellow", "green", "light grey", "light grey"],
+    fishes: ["yellow", "grey", "green", "cyan", "purple"],
+    probs: [0.35, 0.35, 0.2, 0.05, 0.05],
+    observations: ["yellow", "yellow", "green", "grey", "grey"],
   },
   3: {
-    fishes: ["white", "cyan", "green", "red"],
-    probs: [0.1, 0.2, 0.4, 0.3],
+    fishes: ["white", "cyan", "green", "purple", "red"],
+    probs: [0.05, 0.1, 0.5, 0.05, 0.3],
     observations: ["green", "green", "green", "cyan", "red", "red"],
   },
   "-1": {
@@ -81,11 +70,11 @@ export const fishesByCondition = {
     probs: [0.3, 0.5, 0.2],
   },
   "-2": {
-    fishes: ["blue", "white", "dark grey"],
+    fishes: ["blue", "white", "grey"],
     probs: [0.6, 0.1, 0.3],
   },
   "-3": {
-    fishes: ["purple", "light grey", "yellow"],
+    fishes: ["purple", "grey", "yellow"],
     probs: [0.2, 0.4, 0.4],
   },
 };
@@ -133,7 +122,6 @@ export const getInstructionPages = (
 };
 
 export const getBlockHeaderHTML = (condition) => {
-  const nFishes = nTrialsByCondition[condition];
   const fishNames = fishesByCondition[condition].fishes;
   const fishImages = fishNames
     .map((fish) => fishHTML.replace("%choice%", fish.replace(" ", "-")))

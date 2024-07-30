@@ -21,7 +21,6 @@ import {
   fishingRodHTML,
   formatCaughtFish,
   messageConditionLimits,
-  nTrialsByCondition,
   fishesByCondition,
   consentText,
   testPhaseInstructions,
@@ -303,7 +302,6 @@ function getReceiveMessageTrial(
 
 function getLearningTrials(stimulusCondition, jsPsych) {
   const fishes = fishesByCondition[stimulusCondition].fishes;
-  const nTrials = nTrialsByCondition[stimulusCondition];
   const observations = fishesByCondition[stimulusCondition].observations;
 
   const timeline = [];
@@ -577,7 +575,7 @@ function getOnePracticeRound(
     type: HtmlButtonResponse,
     stimulus: () => {
       // get the probs and conf
-      const counts = jsPsych.data
+      const guessedProbs = jsPsych.data
         .get()
         .filter({ phase: "elicitPosterior" })
         .last(1)
@@ -595,20 +593,20 @@ function getOnePracticeRound(
         "There were " +
         trueProbs
           .slice(0, trueProbs.length - 1)
-          .map((p, i) => `${p * 10} ${trueColors[i]},`)
+          .map((p, i) => `${p * 20} ${trueColors[i]},`)
           .join(" ") +
         " and " +
-        `${trueProbs[trueProbs.length - 1] * 10} ${
+        `${trueProbs[trueProbs.length - 1] * 20} ${
           trueColors[trueColors.length - 1]
         }` +
         " fish in the pond.";
 
       const isCorrect = trueProbs.every((p, i) => {
-        return Math.abs(p - counts[i] / 10) < 0.1;
+        return Math.abs(p - guessedProbs[i]) < 0.05;
       });
 
       const isClose = trueProbs.every((p, i) => {
-        return Math.abs(p - counts[i] / 10) < 0.3;
+        return Math.abs(p - guessedProbs[i]) < 0.3;
       });
 
       const correctString = isCorrect
@@ -712,19 +710,7 @@ export async function run({
   const writeMessage = jsPsych.data.getURLVariable("wM");
   const timeline = [];
 
-  timeline.push({
-    type: SendMessagePlugin,
-    choices: fishesByCondition[0].fishes,
-    length: 5,
-    prompt: `Please write a message to help the next participant. You can send 5 symbols.`,
-    data: {
-      phase: "writeMessage",
-      stimulusCondition: 0,
-      characterLimit: 5,
-    },
-  });
-
-  // add the initial trials
+  // // add the initial trials
   timeline.push(
     ...getInitialTrials(
       assetPaths,
@@ -791,5 +777,5 @@ export async function run({
 
   timeline.push(getPostExperimentSurvey());
 
-  timeline = await jsPsych.run(timeline);
+  await jsPsych.run(timeline);
 }

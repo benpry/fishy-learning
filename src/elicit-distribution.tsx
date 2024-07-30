@@ -67,11 +67,11 @@ class ElicitDistributionPlugin implements JsPsychPlugin<Info> {
     };
 
     // function to handle responses by the subject
-    function after_response(probs, conf) {
+    function after_response(counts, conf) {
       // measure rt
       var end_time = performance.now();
       var rt = Math.round(end_time - start_time);
-      response.probs = probs;
+      response.probs = counts.map((c) => c / 20);
       response.conf = conf;
       response.rt = rt;
 
