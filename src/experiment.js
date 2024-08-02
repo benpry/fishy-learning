@@ -156,8 +156,6 @@ function getInitialTrials(
     },
   ];
 
-  // shuffle(qs);
-
   const correctAnswers = {
     proportions: "true",
     goal: "false",
@@ -478,9 +476,7 @@ function getOnePracticeRound(
   });
 
   if (receiveMessage == 1) {
-    const exampleMessage = range(characterLimit).map(() =>
-      sampleFish(fishes, fishProbs),
-    );
+    const exampleMessage = range(characterLimit).map(() => "black");
     practiceRoundTimeline.push({
       type: ReadMessagePlugin,
       message: exampleMessage,
@@ -710,7 +706,7 @@ export async function run({
   const writeMessage = jsPsych.data.getURLVariable("wM");
   const timeline = [];
 
-  // // add the initial trials
+  // add the initial trials
   timeline.push(
     ...getInitialTrials(
       assetPaths,

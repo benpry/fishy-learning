@@ -1,7 +1,6 @@
 import consentHtml from "../assets/instructions/consent.html";
 import teacherInstructionsHtml from "../assets/instructions/teacher-instructions.html";
 import learnerInstructionsHtml from "../assets/instructions/learner-instructions.html";
-import individualInstructionsHtml from "../assets/instructions/individual-instructions.html";
 import testPhaseInstructionsHtml from "../assets/instructions/test-phase-instructions.html";
 
 export const fishingRodHTML = `
@@ -34,13 +33,14 @@ export const colors = {
   cyan: "#66CCEE",
   purple: "#AA3377",
   white: "#FFFFFF",
+  black: "#000000",
   grey: "#888888",
 };
 
 export const messageConditionLimits = {
   0: 1,
   1: 3,
-  2: 5,
+  2: 6,
   3: 10,
 };
 
@@ -106,18 +106,12 @@ export const getInstructionPages = (
       "<hr/>",
     );
     return instructionsHtml.split("<hr/>");
-  } else if (receiveMessage == 1) {
+  } else {
     const instructionsHtml = eval("`" + learnerInstructionsHtml + "`").replace(
       /<hr \/>/g,
       "<hr/>",
     );
     return instructionsHtml.split("<hr/>");
-  } else {
-    const individualHtml = eval("`" + individualInstructionsHtml + "`").replace(
-      /<hr \/>/g,
-      "<hr/>",
-    );
-    return individualHtml.split("<hr/>");
   }
 };
 
