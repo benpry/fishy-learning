@@ -127,7 +127,7 @@ export const getBlockHeaderHTML = (condition) => {
     .slice(0, fishNames.length - 1)
     .join(", ")}, and ${fishNames[fishNames.length - 1]}.</p>
 ${fishImages}
-<p class="instructions-text">You know there is at least one of each type of fish in the pond.</p>
+<p class="instructions-text">You know there is at least one fish of each type in the pond.</p>
 `;
 };
 

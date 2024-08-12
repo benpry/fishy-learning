@@ -133,7 +133,8 @@ export default function Elicitation(props) {
         style={{
           position: "relative",
           margin: "0 auto 3em auto",
-          width: "500px",
+          width: "300px",
+          textAlign: "left",
         }}
       >
         Information:{" "}

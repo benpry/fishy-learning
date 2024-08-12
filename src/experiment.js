@@ -40,6 +40,8 @@ import { proliferate } from "./proliferate";
 import ElicitDistributionPlugin from "./elicit-distribution";
 import ReadMessagePlugin from "./read-message";
 import SendMessagePlugin from "./send-message";
+import ComposeMessagePlugin from "./compose-message";
+import ViewMessagePlugin from "./view-message";
 import { jStat } from "jstat";
 
 const handleChainAssignment = (
@@ -90,7 +92,7 @@ const practiceConditionNObs = [
   [7, 8],
 ];
 const practiceStimulusConditions = ["-1", "-2", "-3"];
-const practiceMessageConditionLimits = [1, 3, 5];
+const practiceMessageConditionLimits = [1, 2, 4];
 
 function getInitialTrials(
   assetPaths,
@@ -270,25 +272,25 @@ function getReceiveMessageTrial(
   stimulusCondition,
 ) {
   return {
-    type: ReadMessagePlugin,
+    type: ViewMessagePlugin,
+    stimulusCondition: stimulusCondition,
+    prompt: "The previous participant left you a message.",
     message: () => {
       const chain = chainHolder.item;
       return chain == null || chain.messages.length == 0
         ? []
         : chain.messages[chain.messages.length - 1];
     },
-    prompt: "The previous participant left the following message for you:",
     data: () => {
       const chain = chainHolder.item;
       return {
         phase: "readMessage",
         chainId: chain._id,
         messageReceived: chain.messages[chain.messages.length - 1],
-        characterLimit: messageConditionLimits[chainHolder.messageCondition],
+        revealedLimit: messageConditionLimits[chainHolder.messageCondition],
         stimulusCondition: stimulusCondition,
       };
     },
-    choices: ["Continue"],
     on_finish: () => {
       const chain = chainHolder.item;
       if (writeMessage == 0) {
@@ -358,20 +360,11 @@ function getWriteMessageTrials(stimulusCondition, chainHolder) {
   const timeline = [];
 
   const writeMessageTrial = {
-    type: SendMessagePlugin,
-    choices: fishesByCondition[stimulusCondition].fishes,
-    length: () => {
+    type: ComposeMessagePlugin,
+    stimulusCondition: stimulusCondition,
+    revealedLimit: () => {
       const chain = chainHolder.item;
       return messageConditionLimits[chainHolder.messageCondition];
-    },
-    prompt: () => {
-      const messageCondition = chainHolder.messageCondition;
-      const characterLimit = messageConditionLimits[messageCondition];
-      let ret = `Please write a message to help the next participant. You can send ${characterLimit} symbol`;
-      if (characterLimit > 1) {
-        ret += "s";
-      }
-      return ret + ".";
     },
     on_finish: function (data) {
       const chain = chainHolder.item;
@@ -381,7 +374,7 @@ function getWriteMessageTrials(stimulusCondition, chainHolder) {
       const chain = chainHolder.item;
       return {
         phase: "writeMessage",
-        characterLimit: messageConditionLimits[chainHolder.messageCondition],
+        revealedLimit: messageConditionLimits[chainHolder.messageCondition],
         chainId: chain._id,
         stimulusCondition: stimulusCondition,
       };
@@ -461,7 +454,7 @@ function getOnePracticeRound(
   receiveMessage,
   stimulusCondition,
   nTrials,
-  characterLimit,
+  revealedLimit,
   jsPsych,
 ) {
   const fishes = fishesByCondition[stimulusCondition].fishes;
@@ -476,17 +469,17 @@ function getOnePracticeRound(
   });
 
   if (receiveMessage == 1) {
-    const exampleMessage = range(characterLimit).map(() => "black");
+    const exampleMessage = { information: 0 };
     practiceRoundTimeline.push({
-      type: ReadMessagePlugin,
+      type: ViewMessagePlugin,
+      stimulusCondition: stimulusCondition,
       message: exampleMessage,
-      prompt: "Here is an example message:",
-      choices: ["Continue"],
+      prompt: "This is an example message.",
       data: {
         phase: "readMessage",
         chainId: "practiceChainId",
         messageReceived: exampleMessage,
-        characterLimit: characterLimit,
+        revealedLimit: revealedLimit,
         stimulusCondition: stimulusCondition,
       },
     });
@@ -543,44 +536,38 @@ function getOnePracticeRound(
   };
   practiceRoundTimeline.push(learningTimeline);
 
-  if (writeMessage == 1) {
-    const writeMessageTrial = {
-      type: SendMessagePlugin,
-      choices: fishesByCondition[stimulusCondition].fishes,
-      length: characterLimit,
-      prompt:
-        characterLimit == 1
-          ? `Please write a message to help the next participant. You can send ${characterLimit} symbol.`
-          : `Please write a message to help the next participant. You can send ${characterLimit} symbols.`,
-      data: {
-        phase: "writeMessage",
-        stimulusCondition: stimulusCondition,
-        characterLimit: characterLimit,
-      },
-    };
-    practiceRoundTimeline.push(writeMessageTrial);
-  }
-
   // add dependent measure
   practiceRoundTimeline.push(
     ...getTestTrials(stimulusCondition, "elicitPosterior"),
   );
+
+  if (writeMessage == 1) {
+    const writeMessageTrial = {
+      type: ComposeMessagePlugin,
+      stimulusCondition: stimulusCondition,
+      revealedLimit: revealedLimit,
+      data: {
+        phase: "writeMessage",
+        stimulusCondition: stimulusCondition,
+        revealedLimit: revealedLimit,
+      },
+    };
+    practiceRoundTimeline.push(writeMessageTrial);
+  }
 
   // feedback
   practiceRoundTimeline.push({
     type: HtmlButtonResponse,
     stimulus: () => {
       // get the probs and conf
-      const guessedProbs = jsPsych.data
+      const lastElicitation = jsPsych.data
         .get()
         .filter({ phase: "elicitPosterior" })
         .last(1)
-        .values()[0].probs;
-      const conf = jsPsych.data
-        .get()
-        .filter({ phase: "elicitPosterior" })
-        .last(1)
-        .values()[0].conf;
+        .values()[0];
+
+      const guessedProbs = lastElicitation.probs;
+      const conf = lastElicitation.conf;
 
       const trueProbs = fishesByCondition[stimulusCondition].probs;
       const trueColors = fishesByCondition[stimulusCondition].fishes;
@@ -643,7 +630,7 @@ function getPracticeRounds(doLearning, writeMessage, receiveMessage, jsPsych) {
     const stimulusCondition = practiceStimulusConditions[i];
     const nObsCategory = practiceConditionNObs[i];
     const nObs = Math.random() < 0.5 ? nObsCategory[0] : nObsCategory[1];
-    const characterLimit = practiceMessageConditionLimits[i];
+    const revealedLimit = practiceMessageConditionLimits[i];
     practiceTimeline.push(
       ...getOnePracticeRound(
         doLearning,
@@ -651,7 +638,7 @@ function getPracticeRounds(doLearning, writeMessage, receiveMessage, jsPsych) {
         receiveMessage,
         stimulusCondition,
         nObs,
-        characterLimit,
+        revealedLimit,
         jsPsych,
       ),
     );
@@ -755,15 +742,15 @@ export async function run({
       blockTimeline.push(...getLearningTrials(stimulusCondition, jsPsych));
     }
 
+    // add the test trials
+    blockTimeline.push(...getTestTrials(stimulusCondition, "elicitPosterior"));
+
     // add the message writing trials
     if (writeMessage == 1) {
       blockTimeline.push(
         ...getWriteMessageTrials(stimulusCondition, chainHolder),
       );
     }
-
-    // add the test trials
-    blockTimeline.push(...getTestTrials(stimulusCondition, "elicitPosterior"));
 
     timeline.push({
       timeline: blockTimeline,
