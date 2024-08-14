@@ -1,4 +1,5 @@
 var { jStat } = require("jstat");
+import { fishesByCondition } from "./constants.js";
 
 export function range(n) {
   return [...Array(n).keys()];
@@ -75,4 +76,25 @@ export function findHDI(alpha, beta) {
   upper = Math.min(1, upper);
 
   return [lower, upper];
+}
+
+export function messageToProbsAndConf(message, stimulusCondition) {
+  // Convert a message to a probs and conf
+  let probs = [];
+  for (let fish of fishesByCondition[stimulusCondition]["fishes"]) {
+    if (message.hasOwnProperty(fish)) {
+      probs.push(message[fish] / 20);
+    } else {
+      probs.push("");
+    }
+  }
+
+  let conf = message.hasOwnProperty("information")
+    ? message["information"]
+    : "";
+
+  return {
+    probs: probs,
+    conf: conf,
+  };
 }

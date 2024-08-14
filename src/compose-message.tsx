@@ -15,6 +15,10 @@ const info = {
       type: ParameterType.INT,
       pretty_name: "Max. number of numbers that can be revealed",
     },
+    initialization: {
+      type: ParameterType.OBJECT,
+      pretty_name: "Initialization",
+    },
   },
 };
 
@@ -86,6 +90,7 @@ class ComposeMessagePlugin implements JsPsychPlugin<Info> {
         submitFn={after_response}
         stimulusCondition={trial.stimulusCondition}
         revealedLimit={trial.revealedLimit}
+        initialization={trial.initialization}
       />,
     );
   }

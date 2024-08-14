@@ -7,15 +7,21 @@ export default function ComposeMessage(props) {
   const stimulusCondition = props.stimulusCondition;
   const fishNames = fishesByCondition[stimulusCondition].fishes;
   const nFishes = fishNames.length;
+  const initialization = props.initialization || {
+    probs: Array(nFishes).fill(""),
+    conf: "",
+  };
   // the confidence you would have to have for a uniform distribution
   const minConf = 1;
   const maxConf = 15;
 
   const maxRevealed = props.revealedLimit || nFishes + 1;
 
-  const [counts, updateCounts] = useState(Array(nFishes).fill(""));
-  const [revealed, updateRevealed] = useState(Array(nFishes + 1).fill(false));
-  const [conf, updateConf] = useState("");
+  const [counts, updateCounts] = useState(
+    initialization.probs.map((x) => x * 20),
+  );
+  const [revealed, updateRevealed] = useState(Array(nFishes + 1).fill(true));
+  const [conf, updateConf] = useState(initialization.conf);
   const [responseMessage, setResponseMessage] = useState(
     "Press 'Send' to send this message.",
   );
@@ -34,8 +40,12 @@ export default function ComposeMessage(props) {
       return;
     } else if (revealed.filter((x) => x).length < maxRevealed && !warned) {
       setWarned(true);
+      alert(
+        `You have set fewer values than you are allowed to. You can still send this message, but please double-check that this is the message you want to send before submitting. Press 'Send' again if you are sure you want to send it.`,
+      );
+    } else if (revealed.filter((x) => x).length > maxRevealed) {
       setResponseMessage(
-        `You have set fewer than the maximum number of values. Press 'Send' again if you are sure this is the message you want to send.`,
+        "Too many values are revealed! You must hide more values before you can send the message.",
       );
     } else {
       const message = {};
@@ -55,12 +65,6 @@ export default function ComposeMessage(props) {
   const updateRevealedFactory = (i) => {
     return () => {
       const newRevealed = revealed.slice();
-      if (
-        newRevealed.filter((r) => r).length >= maxRevealed &&
-        !newRevealed[i]
-      ) {
-        return;
-      }
       newRevealed[i] = !newRevealed[i];
       updateRevealed(newRevealed);
     };

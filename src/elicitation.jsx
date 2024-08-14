@@ -42,12 +42,22 @@ export default function Elicitation(props) {
   const stimulusCondition = props.stimulusCondition;
   const fishNames = fishesByCondition[stimulusCondition].fishes;
   const nFishes = fishNames.length;
+
+  const initialization = props.initialization || {
+    probs: Array(nFishes).fill(""),
+    conf: "",
+  };
+
   // the confidence you would have to have for a uniform distribution
   const minConf = 1;
   const maxConf = 15;
 
-  const [counts, updateCounts] = useState(Array(nFishes).fill(""));
-  const [conf, updateConf] = useState("");
+  const [counts, updateCounts] = useState(
+    initialization.probs.map((p) => {
+      return p == "" ? "" : Math.round(p * 20);
+    }),
+  );
+  const [conf, updateConf] = useState(initialization.conf);
   const [responseMessage, setResponseMessage] = useState(
     "Press 'Submit' when you are happy with your prediction.",
   );

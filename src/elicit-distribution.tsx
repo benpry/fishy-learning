@@ -1,4 +1,5 @@
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
+import { messageToProbsAndConf } from "./utils";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import Elicitation from "./Elicitation";
@@ -10,6 +11,10 @@ const info = {
     stimulusCondition: {
       type: ParameterType.INT,
       pretty_name: "Stimulus condition",
+    },
+    initialization: {
+      type: ParameterType.OBJECT,
+      pretty_name: "Initial state",
     },
   },
 };
@@ -78,11 +83,18 @@ class ElicitDistributionPlugin implements JsPsychPlugin<Info> {
       end_trial();
     }
 
+    const initializationProbsConf = trial.initialization
+      ? trial.initialization.hasOwnProperty("probs")
+        ? trial.initialization
+        : messageToProbsAndConf(trial.initialization, trial.stimulusCondition)
+      : null;
+
     const root = createRoot(node);
     root.render(
       <Elicitation
         submitFn={after_response}
         stimulusCondition={trial.stimulusCondition}
+        initialization={initializationProbsConf}
       />,
     );
   }

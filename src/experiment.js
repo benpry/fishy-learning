@@ -278,7 +278,7 @@ function getReceiveMessageTrial(
     message: () => {
       const chain = chainHolder.item;
       return chain == null || chain.messages.length == 0
-        ? []
+        ? {}
         : chain.messages[chain.messages.length - 1];
     },
     data: () => {
@@ -356,12 +356,27 @@ function getLearningTrials(stimulusCondition, jsPsych) {
   return timeline;
 }
 
-function getWriteMessageTrials(stimulusCondition, chainHolder) {
+function getWriteMessageTrials(stimulusCondition, chainHolder, jsPsych) {
   const timeline = [];
 
   const writeMessageTrial = {
     type: ComposeMessagePlugin,
     stimulusCondition: stimulusCondition,
+    initialization: () => {
+      const lastTrial = jsPsych.data
+        .get()
+        .filter({ phase: "elicitPosterior" })
+        .last(1)
+        .values()[0];
+
+      const probs = lastTrial.probs;
+      const conf = lastTrial.conf;
+
+      return {
+        probs: probs,
+        conf: conf,
+      };
+    },
     revealedLimit: () => {
       const chain = chainHolder.item;
       return messageConditionLimits[chainHolder.messageCondition];
@@ -385,7 +400,13 @@ function getWriteMessageTrials(stimulusCondition, chainHolder) {
   return timeline;
 }
 
-function getTestTrials(stimulusCondition, phaseName) {
+function getTestTrials(
+  stimulusCondition,
+  phaseName,
+  chainHolder,
+  prepopulate,
+  jsPsych,
+) {
   const timeline = [];
 
   timeline.push({
@@ -398,6 +419,35 @@ function getTestTrials(stimulusCondition, phaseName) {
   timeline.push({
     type: ElicitDistributionPlugin,
     stimulusCondition: stimulusCondition,
+    initialization: () => {
+      console.log("prepopulate", prepopulate);
+      if (prepopulate) {
+        console.log("prepopulating");
+        if (phaseName == "elicitPrior") {
+          const chain = chainHolder.item;
+          return chain == null || chain.messages.length == 0
+            ? {}
+            : chain.messages[chain.messages.length - 1];
+        } else if (phaseName == "elicitPosterior") {
+          console.log("in elicit posterior");
+          const lastTrial = jsPsych.data
+            .get()
+            .filter({ phase: "elicitPrior" })
+            .last(1)
+            .values()[0];
+
+          console.log("lastTrial", lastTrial);
+
+          const probs = lastTrial.probs;
+          const conf = lastTrial.conf;
+
+          return {
+            probs: probs,
+            conf: conf,
+          };
+        }
+      }
+    },
     data: { phase: phaseName, stimulusCondition: stimulusCondition },
   });
 
@@ -483,9 +533,10 @@ function getOnePracticeRound(
         stimulusCondition: stimulusCondition,
       },
     });
+
     // add dependent measure
     practiceRoundTimeline.push(
-      ...getTestTrials(stimulusCondition, "elicitPrior"),
+      ...getTestTrials(stimulusCondition, "elicitPrior", null, false, jsPsych),
     );
   }
 
@@ -538,7 +589,7 @@ function getOnePracticeRound(
 
   // add dependent measure
   practiceRoundTimeline.push(
-    ...getTestTrials(stimulusCondition, "elicitPosterior"),
+    ...getTestTrials(stimulusCondition, "elicitPosterior", null, true, jsPsych),
   );
 
   if (writeMessage == 1) {
@@ -546,6 +597,21 @@ function getOnePracticeRound(
       type: ComposeMessagePlugin,
       stimulusCondition: stimulusCondition,
       revealedLimit: revealedLimit,
+      initialization: () => {
+        const lastTrial = jsPsych.data
+          .get()
+          .filter({ phase: "elicitPosterior" })
+          .last(1)
+          .values()[0];
+
+        const probs = lastTrial.probs;
+        const conf = lastTrial.conf;
+
+        return {
+          probs: probs,
+          conf: conf,
+        };
+      },
       data: {
         phase: "writeMessage",
         stimulusCondition: stimulusCondition,
@@ -722,7 +788,7 @@ export async function run({
       ),
     );
 
-    // add receive message tiral
+    // add receive message trial
     if (receiveMessage == 1) {
       blockTimeline.push(
         getReceiveMessageTrial(
@@ -734,7 +800,15 @@ export async function run({
       );
 
       // then add the post-message elicitation
-      blockTimeline.push(...getTestTrials(stimulusCondition, "elicitPrior"));
+      blockTimeline.push(
+        ...getTestTrials(
+          stimulusCondition,
+          "elicitPrior",
+          chainHolder,
+          true,
+          jsPsych,
+        ),
+      );
     }
 
     // add the learning trials
@@ -743,12 +817,20 @@ export async function run({
     }
 
     // add the test trials
-    blockTimeline.push(...getTestTrials(stimulusCondition, "elicitPosterior"));
+    blockTimeline.push(
+      ...getTestTrials(
+        stimulusCondition,
+        "elicitPosterior",
+        chainHolder,
+        true,
+        jsPsych,
+      ),
+    );
 
     // add the message writing trials
     if (writeMessage == 1) {
       blockTimeline.push(
-        ...getWriteMessageTrials(stimulusCondition, chainHolder),
+        ...getWriteMessageTrials(stimulusCondition, chainHolder, jsPsych),
       );
     }
 
