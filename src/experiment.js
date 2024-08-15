@@ -589,7 +589,13 @@ function getOnePracticeRound(
 
   // add dependent measure
   practiceRoundTimeline.push(
-    ...getTestTrials(stimulusCondition, "elicitPosterior", null, true, jsPsych),
+    ...getTestTrials(
+      stimulusCondition,
+      "elicitPosterior",
+      null,
+      receiveMessage == 1,
+      jsPsych,
+    ),
   );
 
   if (writeMessage == 1) {
@@ -822,7 +828,7 @@ export async function run({
         stimulusCondition,
         "elicitPosterior",
         chainHolder,
-        true,
+        receiveMessage == 1,
         jsPsych,
       ),
     );
